@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVPP B.Tech 2nd Year Results Portal</title>
+    <title>SVPCET B.Tech 2nd Year Results Portal (R23)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -22,44 +22,46 @@
     <script type="text/babel">
         const { useState } = React;
 
+        // Sample SVPCET R23 Student Database
         const STUDENT_DATABASE = {
-          "22G01A0501": {
-            rollNumber: "22G01A0501",
-            name: "K. RAHUL SHARMA",
-            branch: "Computer Science & Engineering (CSE)",
+          "23G01A4301": {
+            rollNumber: "23G01A4301",
+            name: "K. SAI KUMAR",
+            branch: "Artificial Intelligence (AI)",
             yearSem: "B.Tech II Year - I Semester",
-            regulation: "R20",
-            college: "Sri Venkateswara College of Engineering (SVPP / SVCE)",
+            regulation: "R23",
+            college: "Sri Venkatesa Perumal College of Engineering & Technology (SVPCET)",
             status: "PASSED",
-            sgpa: 8.45,
-            cgpa: 8.21,
+            sgpa: 8.52,
+            cgpa: 8.35,
             subjects: [
-              { code: "20A05301T", name: "Discrete Mathematics", credits: 3, grade: "A+", status: "P" },
-              { code: "20A05302T", name: "Data Structures & Algorithms", credits: 3, grade: "A", status: "P" },
-              { code: "20A05303T", name: "Object Oriented Programming (Java)", credits: 3, grade: "O", status: "P" },
-              { code: "20A05304T", name: "Computer Organization", credits: 3, grade: "B+", status: "P" },
-              { code: "20A05305P", name: "Data Structures Lab", credits: 1.5, grade: "O", status: "P" },
-              { code: "20A05306P", name: "Java Programming Lab", credits: 1.5, grade: "A+", status: "P" },
-              { code: "20A52301", name: "Universal Human Values", credits: 2, grade: "A", status: "P" }
+              { code: "23ABS13", name: "Discrete Mathematics & Graph Theory", credits: 3, grade: "A+", status: "P" },
+              { code: "23AHS04", name: "Universal Human Values - 2", credits: 3, grade: "A", status: "P" },
+              { code: "23AEC05", name: "Digital Logic & Computer Organization", credits: 3, grade: "O", status: "P" },
+              { code: "23ACS05T", name: "Advanced Data Structures & Algorithms", credits: 3, grade: "A+", status: "P" },
+              { code: "23ACS06T", name: "Object Oriented Programming Through Java", credits: 3, grade: "O", status: "P" },
+              { code: "23ACS05P", name: "Advanced Data Structures Lab", credits: 1.5, grade: "O", status: "P" },
+              { code: "23ACS06P", name: "Java Programming Lab", credits: 1.5, grade: "A+", status: "P" }
             ]
           },
-          "22G01A0402": {
-            rollNumber: "22G01A0402",
-            name: "P. ANITHA REDDY",
-            branch: "Electronics & Communication Engineering (ECE)",
-            yearSem: "B.Tech II Year - II Semester",
-            regulation: "R20",
-            college: "Sri Venkateswara College of Engineering (SVPP / SVCE)",
+          "23G01A0502": {
+            rollNumber: "25g01a4301",
+            name: "M. PRIYA SHARMA",
+            branch: "Computer Science & Engineering (CSE)",
+            yearSem: "B.Tech II Year - I Semester",
+            regulation: "R23",
+            college: "Sri Venkatesa Perumal College of Engineering & Technology (SVPCET)",
             status: "PASSED",
-            sgpa: 7.92,
-            cgpa: 8.05,
+            sgpa: 8.10,
+            cgpa: 8.02,
             subjects: [
-              { code: "20A04401T", name: "Electromagnetic Waves & Transmission Lines", credits: 3, grade: "B+", status: "P" },
-              { code: "20A04402T", name: "Analog Circuits", credits: 3, grade: "A", status: "P" },
-              { code: "20A04403T", name: "Signals and Systems", credits: 3, grade: "A+", status: "P" },
-              { code: "20A04404T", name: "Analog Communications", credits: 3, grade: "B", status: "P" },
-              { code: "20A04405P", name: "Analog Circuits Lab", credits: 1.5, grade: "O", status: "P" },
-              { code: "20A04406P", name: "Analog Communications Lab", credits: 1.5, grade: "A+", status: "P" }
+              { code: "25g01a4302", name: "Discrete Mathematics & Graph Theory", credits: 3, grade: "A", status: "P" },
+              { code: "25g01a4303", name: "Universal Human Values - 2", credits: 3, grade: "B+", status: "P" },
+              { code: "25g01a4304", name: "Digital Logic & Computer Organization", credits: 3, grade: "A", status: "P" },
+              { code: "25g01a4305", name: "Advanced Data Structures & Algorithms", credits: 3, grade: "A+", status: "P" },
+              { code: "25g01a4306", name: "Object Oriented Programming Through Java", credits: 3, grade: "A", status: "P" },
+              { code: "25g01a4307", name: "Advanced Data Structures Lab", credits: 1.5, grade: "O", status: "P" },
+              { code: "25g01a4308", name: "Java Programming Lab", credits: 1.5, grade: "O", status: "P" }
             ]
           }
         };
@@ -75,7 +77,7 @@
             const cleanRoll = searchInput.trim().toUpperCase();
 
             if (!cleanRoll) {
-              setErrorMsg('Please enter a valid Hall Ticket / Roll Number.');
+              setErrorMsg('Please enter a valid Roll Number / Hall Ticket Number.');
               setResultData(null);
               return;
             }
@@ -84,7 +86,7 @@
               setResultData(STUDENT_DATABASE[cleanRoll]);
               setErrorMsg('');
             } else {
-              setErrorMsg(`No 2nd Year B.Tech results found for Roll Number: "${cleanRoll}".`);
+              setErrorMsg(`No 2nd Year B.Tech (R23) results found for Roll Number: "${cleanRoll}".`);
               setResultData(null);
             }
           };
@@ -97,28 +99,30 @@
 
           return (
             <div className="min-h-screen flex flex-col justify-between">
-              <header className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-lg print:hidden">
+              {/* Header */}
+              <header className="bg-gradient-to-r from-blue-950 via-indigo-900 to-slate-900 text-white shadow-lg print:hidden">
                 <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-14 h-14 bg-white text-blue-900 rounded-full flex items-center justify-center font-extrabold text-2xl shadow-inner border-2 border-amber-400">
-                      SV
+                    <div className="w-14 h-14 bg-white text-blue-900 rounded-full flex items-center justify-center font-extrabold text-xl shadow-inner border-2 border-amber-400">
+                      SVPCET
                     </div>
                     <div>
-                      <h1 className="text-xl md:text-2xl font-black tracking-wide">SVPP / SVCE EXAMINATION PORTAL</h1>
-                      <p className="text-xs text-blue-200 mt-0.5">Sri Venkateswara College Results Engine & Marks Memo</p>
+                      <h1 className="text-xl md:text-2xl font-black tracking-wide">SVPCET EXAMINATION PORTAL</h1>
+                      <p className="text-xs text-blue-200 mt-0.5">Sri Venkatesa Perumal College of Engineering & Technology</p>
                     </div>
                   </div>
                   <div className="bg-blue-800/60 border border-blue-700/50 rounded-xl px-4 py-2 text-center md:text-right">
-                    <span className="text-xs text-amber-300 font-semibold uppercase tracking-wider block">Academic Session</span>
-                    <span className="text-sm font-bold text-white">B.Tech 2nd Year Regular / Supply Results</span>
+                    <span className="text-xs text-amber-300 font-semibold uppercase tracking-wider block">Academic Scheme</span>
+                    <span className="text-sm font-bold text-white">B.Tech 2nd Year Regular Results (R23)</span>
                   </div>
                 </div>
               </header>
 
+              {/* Search Section & Main Content */}
               <main className="flex-grow max-w-5xl w-full mx-auto px-4 py-8">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 print:hidden">
-                  <h2 className="text-lg font-bold text-slate-800 mb-1">Check Examination Results</h2>
-                  <p className="text-xs text-slate-500 mb-6">Enter your 10-digit Hall Ticket Number to retrieve your B.Tech 2nd Year mark statement.</p>
+                  <h2 className="text-lg font-bold text-slate-800 mb-1">Check SVPCET B.Tech Results</h2>
+                  <p className="text-xs text-slate-500 mb-6">Enter your 10-digit Hall Ticket / Roll Number to view R23 Regulation statement of marks.</p>
 
                   <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -128,16 +132,16 @@
                         onChange={(e) => setSelectedSem(e.target.value)}
                         className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
                       >
-                        <option value="2-1">B.Tech II Year I Semester (2-1)</option>
-                        <option value="2-2">B.Tech II Year II Semester (2-2)</option>
+                        <option value="2-1">B.Tech II Year I Semester (2-1) - R23</option>
+                        <option value="2-2">B.Tech II Year II Semester (2-2) - R23</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-600 uppercase mb-2">Hall Ticket / Roll Number</label>
+                      <label className="block text-xs font-bold text-slate-600 uppercase mb-2">Roll Number / Hall Ticket</label>
                       <input
                         type="text"
-                        placeholder="e.g. 22G01A0501"
+                        placeholder="e.g. 23G01A4301"
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                         className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 uppercase focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -164,12 +168,13 @@
                   </form>
 
                   <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                    <span className="font-semibold">Sample Roll Numbers:</span>
-                    <button onClick={() => setSearchInput("22G01A0501")} className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-mono hover:underline">22G01A0501 (CSE)</button>
-                    <button onClick={() => setSearchInput("22G01A0402")} className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-mono hover:underline">22G01A0402 (ECE)</button>
+                    <span className="font-semibold">Sample R23 Roll Numbers:</span>
+                    <button onClick={() => setSearchInput("23G01A4301")} className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-mono hover:underline">23G01A4301 (AI)</button>
+                    <button onClick={() => setSearchInput("23G01A0502")} className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-mono hover:underline">23G01A0502 (CSE)</button>
                   </div>
                 </div>
 
+                {/* Error Banner */}
                 {errorMsg && (
                   <div className="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl mb-8 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -179,23 +184,25 @@
                   </div>
                 )}
 
+                {/* Results Card */}
                 {resultData && (
                   <div className="bg-white rounded-2xl shadow-md border border-slate-300 overflow-hidden print:shadow-none print:border-none">
                     <div className="bg-slate-900 text-white p-6 border-b-4 border-amber-400">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h2 className="text-2xl font-black tracking-tight">{resultData.college}</h2>
-                          <p className="text-xs text-slate-300 mt-1 uppercase font-semibold tracking-wider">Official Grade Report & Statement of Marks</p>
+                          <h2 className="text-xl md:text-2xl font-black tracking-tight">{resultData.college}</h2>
+                          <p className="text-xs text-slate-300 mt-1 uppercase font-semibold tracking-wider">Official Statement of Marks & Grade Card</p>
                         </div>
                         <button
                           onClick={() => window.print()}
                           className="print:hidden bg-amber-400 hover:bg-amber-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs shadow-sm transition"
                         >
-                          🖨️ Print Result Memo
+                          🖨️ Print Memo
                         </button>
                       </div>
                     </div>
 
+                    {/* Student Metadata */}
                     <div className="p-6 bg-slate-50/50 border-b border-slate-200">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
                         <div className="flex justify-between border-b border-slate-200 pb-2">
@@ -203,26 +210,27 @@
                           <span className="font-bold text-slate-900">{resultData.name}</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-200 pb-2">
-                          <span className="text-slate-500 font-medium">Roll Number:</span>
+                          <span className="text-slate-500 font-medium">Roll / HT Number:</span>
                           <span className="font-mono font-bold text-blue-700">{resultData.rollNumber}</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-200 pb-2">
-                          <span className="text-slate-500 font-medium">Branch / Course:</span>
+                          <span className="text-slate-500 font-medium">Branch / Specialization:</span>
                           <span className="font-semibold text-slate-800">{resultData.branch}</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-200 pb-2">
-                          <span className="text-slate-500 font-medium">Semester / Reg:</span>
+                          <span className="text-slate-500 font-medium">Semester / Regulation:</span>
                           <span className="font-semibold text-slate-800">{resultData.yearSem} ({resultData.regulation})</span>
                         </div>
                       </div>
                     </div>
 
+                    {/* Subject Marks Table */}
                     <div className="p-6 overflow-x-auto">
                       <table className="w-full text-left border-collapse text-xs md:text-sm">
                         <thead>
                           <tr className="bg-slate-100 text-slate-700 uppercase font-bold border-b-2 border-slate-300">
                             <th className="py-3 px-4">Subject Code</th>
-                            <th className="py-3 px-4">Subject Title</th>
+                            <th className="py-3 px-4">Subject Name</th>
                             <th className="py-3 px-4 text-center">Credits</th>
                             <th className="py-3 px-4 text-center">Grade</th>
                             <th className="py-3 px-4 text-center">Result</th>
@@ -246,6 +254,7 @@
                       </table>
                     </div>
 
+                    {/* Footer Summary */}
                     <div className="p-6 bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-4">
                       <div className="flex items-center space-x-6">
                         <div>
@@ -259,7 +268,7 @@
                       </div>
 
                       <div className="flex items-center space-x-3">
-                        <span className="text-xs uppercase font-semibold text-slate-400">Overall Result Status:</span>
+                        <span className="text-xs uppercase font-semibold text-slate-400">Overall Result:</span>
                         <span className="bg-emerald-500 text-slate-950 font-black px-4 py-2 rounded-lg text-sm tracking-wide">
                           {resultData.status}
                         </span>
@@ -269,8 +278,9 @@
                 )}
               </main>
 
+              {/* Footer */}
               <footer className="bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800 print:hidden">
-                <p>© 2026 SVPP / SVCE Examination Cell. All Rights Reserved.</p>
+                <p>© 2026 Sri Venkatesa Perumal College of Engineering & Technology (SVPCET). All Rights Reserved.</p>
               </footer>
             </div>
           );
