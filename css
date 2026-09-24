@@ -10,17 +10,18 @@ body {
     color: #333;
 }
 
+/* College Branding Header */
 .portal-header {
     background-color: #002b49;
     color: #ffffff;
-    padding: 20px;
+    padding: 25px 15px;
     text-align: center;
-    border-bottom: 4px solid #f39c12;
+    border-bottom: 5px solid #f39c12;
 }
 
 .portal-header h1 {
     font-size: 1.8rem;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 }
 
 .portal-header p {
@@ -28,6 +29,7 @@ body {
     color: #d1d8e0;
 }
 
+/* Navigation Tabs */
 .nav-tabs {
     display: flex;
     justify-content: center;
@@ -37,31 +39,40 @@ body {
 .nav-tabs button {
     background: none;
     border: none;
-    color: #fff;
-    padding: 12px 24px;
+    color: #ffffff;
+    padding: 14px 28px;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
 }
 
 .nav-tabs button.active {
     background-color: #f39c12;
-    color: #000;
+    color: #000000;
     font-weight: bold;
 }
 
+/* Main Container */
 .container {
     max-width: 1000px;
     margin: 30px auto;
-    background: #fff;
+    background: #ffffff;
     padding: 25px;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+.section-title {
+    color: #002b49;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Search Box Controls */
 .search-box {
     display: flex;
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 12px;
     margin-bottom: 25px;
     justify-content: center;
 }
@@ -74,32 +85,36 @@ body {
 }
 
 .search-box button {
-    padding: 10px 20px;
+    padding: 10px 22px;
     background-color: #002b49;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.2s;
 }
 
 .search-box button:hover {
     background-color: #00406c;
 }
 
+/* Student Profile Information Card */
 .info-card {
     background-color: #eef2f5;
-    padding: 15px;
+    padding: 18px;
     border-radius: 6px;
     margin-bottom: 20px;
+    border-left: 4px solid #002b49;
 }
 
 .info-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
 }
 
+/* Data Tables */
 .results-table {
     width: 100%;
     border-collapse: collapse;
@@ -107,9 +122,10 @@ body {
 }
 
 .results-table th, .results-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
+    border: 1px solid #dddddd;
+    padding: 11px;
     text-align: center;
+    font-size: 0.95rem;
 }
 
 .results-table th {
@@ -118,17 +134,18 @@ body {
 }
 
 .status-pass {
-    color: green;
+    color: #27ae60;
     font-weight: bold;
 }
 
 .status-fail {
-    color: red;
+    color: #e74c3c;
     font-weight: bold;
 }
 
 .error-msg {
-    color: red;
+    color: #c0392b;
     text-align: center;
     margin: 15px 0;
+    font-weight: bold;
 }

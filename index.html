@@ -1,24 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-20">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Web Page</title>
+    <title>SVPCET - Student Examination Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- React & Babel CDN to run JSX directly on GitHub Pages -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
-
-    <header>
-        <h1>Welcome to My Website</h1>
-    </header>
-
-    <main>
-        <p>This is a standard paragraph of text inside the main content area.</p>
-        <a href="https://example.com" target="_blank">Visit Example</a>
-    </main>
-
-    <footer>
-        <p>&copy; 2026 My Web Page</p>
-    </footer>
-
+    <div id="root"></div>
+    <script type="text/babel" src="main.js"></script>
 </body>
 </html>
