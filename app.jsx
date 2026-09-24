@@ -1,228 +1,216 @@
 import React, { useState } from 'react';
-import { STUDENT_DATABASE } from './data';
-import './App.css';
+
+// Complete dataset extracted from document
+const studentsData = [
+  {
+    rollNumber: "25G01A4301",
+    name: "A B SURESH",
+    sgpa: 4.03,
+    subjects: [
+      { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", internal: 22, external: 20, total: 42, cr: 0, gr: "F", result: "FAIL" },
+      { code: "23BS0005", name: "CHEMISTRY", internal: 17, external: 32, total: 49, cr: 3, gr: "E", result: "PASS" },
+      { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", internal: 16, external: 25, total: 41, cr: 3, gr: "E", result: "PASS" },
+      { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", internal: 23, external: 35, total: 58, cr: 3, gr: "D", result: "PASS" },
+      { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", internal: 16, external: 22, total: 38, cr: 0, gr: "F", result: "FAIL" },
+      { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", internal: 23, external: 43, total: 66, cr: 1, gr: "C", result: "PASS" },
+      { code: "23LC0004", name: "CHEMISTRY LAB", internal: 18, external: 40, total: 58, cr: 1, gr: "D", result: "PASS" },
+      { code: "23LC0301", name: "ENGINEERING WORKSHOP", internal: 25, external: 56, total: 81, cr: 1.5, gr: "A", result: "PASS" },
+      { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", internal: 15, external: "AB", total: 15, cr: 0, gr: "-Ab-", result: "FAIL" },
+      { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", internal: "-", external: 77, total: 77, cr: 0.5, gr: "B", result: "PASS" }
+    ]
+  },
+  {
+    rollNumber: "25G01A4302",
+    name: "A G JAMUNA",
+    sgpa: 7.69,
+    subjects: [
+      { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", internal: 25, external: 43, total: 68, cr: 2, gr: "C", result: "PASS" },
+      { code: "23BS0005", name: "CHEMISTRY", internal: 25, external: 41, total: 66, cr: 3, gr: "C", result: "PASS" },
+      { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", internal: 27, external: 45, total: 72, cr: 3, gr: "B", result: "PASS" },
+      { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", internal: 27, external: 47, total: 74, cr: 3, gr: "B", result: "PASS" },
+      { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", internal: 23, external: 35, total: 58, cr: 3, gr: "D", result: "PASS" },
+      { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", internal: 26, external: 59, total: 85, cr: 1, gr: "A", result: "PASS" },
+      { code: "23LC0004", name: "CHEMISTRY LAB", internal: 27, external: 65, total: 92, cr: 1, gr: "S", result: "PASS" },
+      { code: "23LC0301", name: "ENGINEERING WORKSHOP", internal: 27, external: 60, total: 87, cr: 1.5, gr: "A", result: "PASS" },
+      { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", internal: 25, external: 45, total: 70, cr: 1.5, gr: "B", result: "PASS" },
+      { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", internal: "-", external: 85, total: 85, cr: 0.5, gr: "A", result: "PASS" }
+    ]
+  },
+  {
+    rollNumber: "25G01A4303",
+    name: "AM DHANUSH",
+    sgpa: 3.79,
+    subjects: [
+      { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", internal: 18, external: 16, total: 34, cr: 0, gr: "F", result: "FAIL" },
+      { code: "23BS0005", name: "CHEMISTRY", internal: 19, external: 26, total: 45, cr: 3, gr: "E", result: "PASS" },
+      { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", internal: 21, external: 36, total: 57, cr: 3, gr: "D", result: "PASS" },
+      { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", internal: 23, external: 18, total: 41, cr: 0, gr: "F", result: "FAIL" },
+      { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", internal: 20, external: 22, total: 42, cr: 0, gr: "F", result: "FAIL" },
+      { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", internal: 23, external: 38, total: 61, cr: 1, gr: "C", result: "PASS" },
+      { code: "23LC0004", name: "CHEMISTRY LAB", internal: 17, external: 48, total: 65, cr: 1, gr: "C", result: "PASS" },
+      { code: "23LC0301", name: "ENGINEERING WORKSHOP", internal: 25, external: 58, total: 83, cr: 1.5, gr: "A", result: "PASS" },
+      { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", internal: 15, external: 40, total: 55, cr: 1.5, gr: "D", result: "PASS" },
+      { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", internal: "-", external: 85, total: 85, cr: 0.5, gr: "A", result: "PASS" }
+    ]
+  },
+  {
+    rollNumber: "25G01A4304",
+    name: "AP YAMINI",
+    sgpa: 7.69,
+    subjects: [
+      { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", internal: 28, external: 45, total: 73, cr: 2, gr: "B", result: "PASS" },
+      { code: "23BS0005", name: "CHEMISTRY", internal: 26, external: 47, total: 73, cr: 3, gr: "B", result: "PASS" },
+      { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", internal: 20, external: 36, total: 56, cr: 3, gr: "D", result: "PASS" },
+      { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", internal: 29, external: 36, total: 65, cr: 3, gr: "C", result: "PASS" },
+      { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", internal: 25, external: 35, total: 60, cr: 3, gr: "C", result: "PASS" },
+      { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", internal: 26, external: 63, total: 89, cr: 1, gr: "A", result: "PASS" },
+      { code: "23LC0004", name: "CHEMISTRY LAB", internal: 27, external: 62, total: 89, cr: 1, gr: "A", result: "PASS" },
+      { code: "23LC0301", name: "ENGINEERING WORKSHOP", internal: 28, external: 66, total: 94, cr: 1.5, gr: "S", result: "PASS" },
+      { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", internal: 23, external: 48, total: 71, cr: 1.5, gr: "B", result: "PASS" },
+      { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", internal: "-", external: 98, total: 98, cr: 0.5, gr: "S", result: "PASS" }
+    ]
+  },
+  {
+    rollNumber: "25G01A4307",
+    name: "AAVULA DHARANI YADAV",
+    sgpa: 8.85,
+    subjects: [
+      { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", internal: 27, external: 56, total: 83, cr: 2, gr: "A", result: "PASS" },
+      { code: "23BS0005", name: "CHEMISTRY", internal: 27, external: 57, total: 84, cr: 3, gr: "A", result: "PASS" },
+      { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", internal: 27, external: 61, total: 88, cr: 3, gr: "A", result: "PASS" },
+      { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", internal: 28, external: 51, total: 79, cr: 3, gr: "B", result: "PASS" },
+      { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", internal: 28, external: 46, total: 74, cr: 3, gr: "B", result: "PASS" },
+      { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", internal: 27, external: 59, total: 86, cr: 1, gr: "A", result: "PASS" },
+      { code: "23LC0004", name: "CHEMISTRY LAB", internal: 27, external: 67, total: 94, cr: 1, gr: "S", result: "PASS" },
+      { code: "23LC0301", name: "ENGINEERING WORKSHOP", internal: 28, external: 68, total: 96, cr: 1.5, gr: "S", result: "PASS" },
+      { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", internal: 22, external: 62, total: 84, cr: 1.5, gr: "A", result: "PASS" },
+      { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", internal: "-", external: 98, total: 98, cr: 0.5, gr: "S", result: "PASS" }
+    ]
+  },
+  {
+    rollNumber: "25G01A4326",
+    name: "CS PRAVALIKA",
+    sgpa: 9.13,
+    subjects: [
+      { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", internal: 29, external: 56, total: 85, cr: 2, gr: "A", result: "PASS" },
+      { code: "23BS0005", name: "CHEMISTRY", internal: 28, external: 47, total: 75, cr: 3, gr: "B", result: "PASS" },
+      { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", internal: 30, external: 70, total: 100, cr: 3, gr: "S", result: "PASS" },
+      { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", internal: 29, external: 42, total: 71, cr: 3, gr: "B", result: "PASS" },
+      { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", internal: 30, external: 55, total: 85, cr: 3, gr: "A", result: "PASS" },
+      { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", internal: 28, external: 65, total: 93, cr: 1, gr: "S", result: "PASS" },
+      { code: "23LC0004", name: "CHEMISTRY LAB", internal: 29, external: 64, total: 93, cr: 1, gr: "S", result: "PASS" },
+      { code: "23LC0301", name: "ENGINEERING WORKSHOP", internal: 29, external: 67, total: 96, cr: 1.5, gr: "S", result: "PASS" },
+      { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", internal: 21, external: 70, total: 91, cr: 1.5, gr: "S", result: "PASS" },
+      { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", internal: "-", external: 92, total: 92, cr: 0.5, gr: "S", result: "PASS" }
+    ]
+  },
+  {
+    rollNumber: "25G01A4342",
+    name: "E RUSHITHA",
+    sgpa: 9.28,
+    subjects: [
+      { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", internal: 28, external: 55, total: 83, cr: 2, gr: "A", result: "PASS" },
+      { code: "23BS0005", name: "CHEMISTRY", internal: 29, external: 58, total: 87, cr: 3, gr: "A", result: "PASS" },
+      { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", internal: 29, external: 64, total: 93, cr: 3, gr: "S", result: "PASS" },
+      { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", internal: 30, external: 44, total: 74, cr: 3, gr: "B", result: "PASS" },
+      { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", internal: 30, external: 52, total: 82, cr: 3, gr: "A", result: "PASS" },
+      { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", internal: 28, external: 66, total: 94, cr: 1, gr: "S", result: "PASS" },
+      { code: "23LC0004", name: "CHEMISTRY LAB", internal: 30, external: 70, total: 100, cr: 1, gr: "S", result: "PASS" },
+      { code: "23LC0301", name: "ENGINEERING WORKSHOP", internal: 29, external: 66, total: 95, cr: 1.5, gr: "S", result: "PASS" },
+      { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", internal: 29, external: 70, total: 99, cr: 1.5, gr: "S", result: "PASS" },
+      { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", internal: "-", external: 98, total: 98, cr: 0.5, gr: "S", result: "PASS" }
+    ]
+  }
+];
 
 export default function App() {
-  const [searchInput, setSearchInput] = useState('');
-  const [selectedSem, setSelectedSem] = useState('1-1');
-  const [resultData, setResultData] = useState(null);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentStudent = studentsData[currentIndex];
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const cleanRoll = searchInput.trim().toUpperCase();
-
-    if (!cleanRoll) {
-      setErrorMsg('Please enter a valid Hall Ticket / Roll Number.');
-      setResultData(null);
-      return;
-    }
-
-    if (STUDENT_DATABASE[cleanRoll]) {
-      setResultData(STUDENT_DATABASE[cleanRoll]);
-      setErrorMsg('');
-    } else {
-      setErrorMsg(`No B.Tech examination records found for Roll Number: "${cleanRoll}".`);
-      setResultData(null);
+  const handleNext = () => {
+    if (currentIndex < studentsData.length - 1) {
+      setCurrentIndex(currentIndex + 1);
     }
   };
 
-  const handleReset = () => {
-    setSearchInput('');
-    setResultData(null);
-    setErrorMsg('');
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const handleSelect = (e) => {
+    setCurrentIndex(Number(e.target.value));
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-lg print:hidden">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-14 h-14 bg-white text-blue-900 rounded-full flex items-center justify-center font-extrabold text-2xl shadow-inner border-2 border-amber-400">
-              SV
-            </div>
-            <div>
-              <h1 className="text-xl md:text-2xl font-black tracking-wide">SVPCET EXAMINATION PORTAL</h1>
-              <p className="text-xs text-blue-200 mt-0.5">Sri Venkatesa Perumal College Results Engine & Marks Memo</p>
-            </div>
-          </div>
-          <div className="bg-blue-800/60 border border-blue-700/50 rounded-xl px-4 py-2 text-center md:text-right">
-            <span className="text-xs text-amber-300 font-semibold uppercase tracking-wider block">Academic Session</span>
-            <span className="text-sm font-bold text-white">B.Tech R23 Regular Results</span>
-          </div>
-        </div>
-      </header>
+    <div className="portal-container">
+      <div className="header">
+        <h1>Sri Venkatesa Perumal College of Engineering & Technology</h1>
+        <h2>B.TECH (ARTIFICIAL INTELLIGENCE) I SEM REGULAR EXAMINATIONS RESULTS PORTAL</h2>
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-grow max-w-5xl w-full mx-auto px-4 py-8">
-        {/* Search Form Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 print:hidden">
-          <h2 className="text-lg font-bold text-slate-800 mb-1">Check Examination Results</h2>
-          <p className="text-xs text-slate-500 mb-6">Enter your 10-digit Hall Ticket Number to retrieve your B.Tech mark statement.</p>
+      <div className="navigation-controls">
+        <button className="nav-btn" onClick={handlePrev} disabled={currentIndex === 0}>
+          &laquo; Previous
+        </button>
 
-          <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase mb-2">Select Semester</label>
-              <select
-                value={selectedSem}
-                onChange={(e) => setSelectedSem(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
-              >
-                <option value="1-1">B.Tech I Year I Semester (1-1 R23)</option>
-                <option value="2-1">B.Tech II Year I Semester (2-1 R20)</option>
-              </select>
-            </div>
+        <select className="search-select" value={currentIndex} onChange={handleSelect}>
+          {studentsData.map((student, idx) => (
+            <option key={student.rollNumber} value={idx}>
+              {student.rollNumber} - {student.name}
+            </option>
+          ))}
+        </select>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-600 uppercase mb-2">Hall Ticket / Roll Number</label>
-              <input
-                type="text"
-                placeholder="e.g. 25G01A4301 or 25G01A4309"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 uppercase focus:outline-none focus:ring-2 focus:ring-blue-600"
-              />
-            </div>
+        <button className="nav-btn" onClick={handleNext} disabled={currentIndex === studentsData.length - 1}>
+          Next &raquo;
+        </button>
+      </div>
 
-            <div className="flex items-end gap-2">
-              <button
-                type="submit"
-                className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition duration-150 shadow-md text-sm"
-              >
-                Get Results
-              </button>
-              {resultData && (
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-xl transition text-sm"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-          </form>
+      <div className="student-info">
+        <p><strong>Roll Number:</strong> {currentStudent.rollNumber}</p>
+        <p><strong>Student Name:</strong> {currentStudent.name}</p>
+        <p><strong>SGPA:</strong> {currentStudent.sgpa}</p>
+      </div>
 
-          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-            <span className="font-semibold">Sample Roll Numbers:</span>
-            {["25G01A4301", "25G01A4302", "25G01A4307", "25G01A4309"].map((roll) => (
-              <button
-                key={roll}
-                onClick={() => setSearchInput(roll)}
-                className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-mono hover:underline"
-              >
-                {roll}
-              </button>
-            ))}
-          </div>
-        </div>
+      <table className="results-table">
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Sub Code</th>
+            <th>Subject Name</th>
+            <th>Internal</th>
+            <th>External</th>
+            <th>Total</th>
+            <th>Credits</th>
+            <th>Grade</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentStudent.subjects.map((sub, idx) => (
+            <tr key={idx}>
+              <td>{idx + 1}</td>
+              <td>{sub.code}</td>
+              <td style={{ textAlign: 'left' }}>{sub.name}</td>
+              <td>{sub.internal}</td>
+              <td>{sub.external}</td>
+              <td>{sub.total}</td>
+              <td>{sub.cr}</td>
+              <td>{sub.gr}</td>
+              <td className={sub.result === 'PASS' ? 'status-pass' : 'status-fail'}>
+                {sub.result}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-        {/* Error Alert */}
-        {errorMsg && (
-          <div className="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl mb-8 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="text-rose-600 font-bold text-lg">⚠️</span>
-              <p className="text-sm font-semibold text-rose-800">{errorMsg}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Results Card */}
-        {resultData && (
-          <div className="bg-white rounded-2xl shadow-md border border-slate-300 overflow-hidden print:shadow-none print:border-none">
-            <div className="bg-slate-900 text-white p-6 border-b-4 border-amber-400">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-xl md:text-2xl font-black tracking-tight">{resultData.college}</h2>
-                  <p className="text-xs text-slate-300 mt-1 uppercase font-semibold tracking-wider">Official Grade Report & Statement of Marks</p>
-                </div>
-                <button
-                  onClick={() => window.print()}
-                  className="print:hidden bg-amber-400 hover:bg-amber-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs shadow-sm transition"
-                >
-                  🖨️ Print Result Memo
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6 bg-slate-50/50 border-b border-slate-200">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
-                <div className="flex justify-between border-b border-slate-200 pb-2">
-                  <span className="text-slate-500 font-medium">Student Name:</span>
-                  <span className="font-bold text-slate-900">{resultData.name}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
-                  <span className="text-slate-500 font-medium">Roll Number:</span>
-                  <span className="font-mono font-bold text-blue-700">{resultData.rollNumber}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
-                  <span className="text-slate-500 font-medium">Branch / Course:</span>
-                  <span className="font-semibold text-slate-800">{resultData.branch}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
-                  <span className="text-slate-500 font-medium">Semester / Reg:</span>
-                  <span className="font-semibold text-slate-800">{resultData.yearSem} ({resultData.regulation})</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs md:text-sm">
-                <thead>
-                  <tr className="bg-slate-100 text-slate-700 uppercase font-bold border-b-2 border-slate-300">
-                    <th className="py-3 px-4">Subject Code</th>
-                    <th className="py-3 px-4">Subject Title</th>
-                    <th className="py-3 px-4 text-center">Credits</th>
-                    <th className="py-3 px-4 text-center">Grade</th>
-                    <th className="py-3 px-4 text-center">Result</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 font-medium text-slate-800">
-                  {resultData.subjects.map((sub, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50">
-                      <td className="py-3 px-4 font-mono text-slate-600">{sub.code}</td>
-                      <td className="py-3 px-4 font-semibold">{sub.name}</td>
-                      <td className="py-3 px-4 text-center">{sub.credits}</td>
-                      <td className="py-3 px-4 text-center font-bold text-indigo-700">{sub.grade}</td>
-                      <td className="py-3 px-4 text-center">
-                        <span className={`px-2 py-1 rounded text-xs font-bold ${sub.status === 'PASS' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
-                          {sub.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="p-6 bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center space-x-6">
-                <div>
-                  <span className="text-xs text-slate-400 uppercase font-semibold block">Semester SGPA</span>
-                  <span className="text-2xl font-black text-amber-400">{resultData.sgpa}</span>
-                </div>
-                <div className="border-l border-slate-700 pl-6">
-                  <span className="text-xs text-slate-400 uppercase font-semibold block">Cumulative CGPA</span>
-                  <span className="text-2xl font-black text-blue-400">{resultData.cgpa}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <span className="text-xs uppercase font-semibold text-slate-400">Overall Result Status:</span>
-                <span className={`font-black px-4 py-2 rounded-lg text-sm tracking-wide ${resultData.status === 'PASSED' ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white'}`}>
-                  {resultData.status}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800 print:hidden">
-        <p>© 2026 SVPCET Examination Cell. All Rights Reserved.</p>
-      </footer>
+      <div className="summary-card">
+        <span>Student Record {currentIndex + 1} of {studentsData.length}</span>
+        <span>SGPA: {currentStudent.sgpa}</span>
+      </div>
     </div>
   );
 }
