@@ -2,59 +2,279 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Student Database Summary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semester Results Portal</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f6f9; }
-        h2 { color: #333; }
-        table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #007bff; color: white; }
-        tr:hover { background-color: #f1f1f1; }
-        .pass { color: green; font-weight: bold; }
-        .fail { color: red; font-weight: bold; }
+        :root {
+            --primary: #1e3a8a;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --pass: #16a34a;
+            --fail: #dc2626;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .portal-header {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .portal-header h2 {
+            margin: 0 0 8px 0;
+            color: var(--primary);
+        }
+
+        .portal-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .search-box {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .error-message {
+            display: none;
+            color: var(--fail);
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .result-card {
+            display: none;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .student-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .detail-item strong {
+            display: block;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .detail-item span {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .badge-PASSED { color: var(--pass); font-weight: bold; }
+        .badge-FAILED { color: var(--fail); font-weight: bold; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .status-PASS { color: var(--pass); font-weight: 600; }
+        .status-FAIL { color: var(--fail); font-weight: 600; }
+
+        @media (max-width: 600px) {
+            .form-group { flex-direction: column; }
+            button { width: 100%; }
+            th, td { font-size: 0.85rem; padding: 8px; }
+        }
     </style>
 </head>
 <body>
 
-    <h2>Student Academic Results (AI Department)</h2>
+<div class="container">
+    <div class="portal-header">
+        <h2>Sri Venkatesa Perumal College of Engineering & Technology</h2>
+        <p>B.Tech I Year - I Semester Examination Results (R23)</p>
+    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Roll Number</th>
-                <th>Name</th>
-                <th>Branch</th>
-                <th>Status</th>
-                <th>SGPA / CGPA</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>25G01A4301</td><td>A B SURESH</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>4.03</td></tr>
-            <tr><td>25G01A4302</td><td>A G JAMUNA</td><td>Artificial Intelligence (AI)</td><td class="pass">PASSED</td><td>7.69</td></tr>
-            <tr><td>25G01A4303</td><td>A M DHANUSH</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>3.79</td></tr>
-            <tr><td>25G01A4304</td><td>A P YAMINI</td><td>Artificial Intelligence (AI)</td><td class="pass">PASSED</td><td>7.69</td></tr>
-            <tr><td>25G01A4305</td><td>A PREETHI</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>3.00</td></tr>
-            <tr><td>25G01A4306</td><td>A VISHNUVARDHAN</td><td>Artificial Intelligence (AI)</td><td class="pass">PASSED</td><td>7.82</td></tr>
-            <tr><td>25G01A4307</td><td>AAVULA DHARANI YADAV</td><td>Artificial Intelligence (AI)</td><td class="pass">PASSED</td><td>8.85</td></tr>
-            <tr><td>25G01A4310</td><td>ANDHI NAGA PRANATHI</td><td>Artificial Intelligence (AI)</td><td class="pass">PASSED</td><td>7.26</td></tr>
-            <tr><td>25G01A4311</td><td>ANGITEELA BHAVANA</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>6.59</td></tr>
-            <tr><td>25G01A4312</td><td>ARAVA SOUJANYA</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>0.00</td></tr>
-            <tr><td>25G01A4313</td><td>ARDHAMALA SASI KUMAR</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>2.72</td></tr>
-            <tr><td>25G01A4314</td><td>ATTUKARA YAGNITHA</td><td>Artificial Intelligence (AI)</td><td class="pass">PASSED</td><td>8.36</td></tr>
-            <tr><td>25G01A4315</td><td>AYYAPPA YUVANSANKAR</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>3.92</td></tr>
-            <tr><td>25G01A4316</td><td>B JHANSI</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>3.03</td></tr>
-            <tr><td>25G01A4317</td><td>B SHALINI</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>4.38</td></tr>
-            <tr><td>25G01A4318</td><td>B THIRUMALESU</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>1.95</td></tr>
-            <tr><td>25G01A4320</td><td>BODIREDDY LOHITHA</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>6.33</td></tr>
-            <tr><td>25G01A4321</td><td>BORRA LALASA</td><td>Artificial Intelligence (AI)</td><td class="pass">PASSED</td><td>8.64</td></tr>
-            <tr><td>25G01A4322</td><td>BOYA VENU</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>4.38</td></tr>
-            <tr><td>25G01A4323</td><td>BUDAGA VINOD</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>3.74</td></tr>
-            <tr><td>25G01A4324</td><td>BUSUPALLI ARUN KUMAR REDDY</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>2.87</td></tr>
-            <tr><td>25G01A4325</td><td>C DILLI BABU</td><td>Artificial Intelligence (AI)</td><td class="fail">FAILED</td><td>5.26</td></tr>
-            <tr><td>25G01A4326</td><td>C S PRAVALIKA</td><td>Artificial Intelligence (AI)</td><td class="pass">PASSED</td><td>9.13</td></tr>
-            <tr><td>25G01A4327</td><td>CHADALAVADA YASASWINI</td><td>Artificial Intelligence (AI)</td><td class="pass">PASSED</td><td>7.29</td></tr>
-        </tbody>
-    </table>
+    <div class="search-box">
+        <div class="form-group">
+            <input type="text" id="rollInput" placeholder="Enter Roll Number (e.g. 25G01A4301)">
+            <button onclick="searchResult()">View Result</button>
+        </div>
+        <div id="errorMsg" class="error-message">Roll Number not found. Please check and try again.</div>
+    </div>
+
+    <div id="resultCard" class="result-card">
+        <div class="student-details">
+            <div class="detail-item">
+                <strong>Student Name</strong>
+                <span id="studentName">-</span>
+            </div>
+            <div class="detail-item">
+                <strong>Roll Number</strong>
+                <span id="studentRoll">-</span>
+            </div>
+            <div class="detail-item">
+                <strong>Branch</strong>
+                <span id="studentBranch">-</span>
+            </div>
+            <div class="detail-item">
+                <strong>SGPA / CGPA</strong>
+                <span id="studentSGPA">-</span>
+            </div>
+            <div class="detail-item">
+                <strong>Overall Status</strong>
+                <span id="studentStatus">-</span>
+            </div>
+        </div>
+
+        <h3>Subject Grades Summary</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Subject Name</th>
+                    <th>Credits</th>
+                    <th>Grade</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="subjectsTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const STUDENT_DATABASE = {
+      "25G01A4301": { rollNumber: "25G01A4301", name: "A B SURESH", branch: "Artificial Intelligence (AI)", yearSem: "B.Tech I Year - I Semester", status: "FAILED", sgpa: 4.03, subjects: [{ code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 0, grade: "F", status: "FAIL" }, { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "E", status: "PASS" }, { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "E", status: "PASS" }, { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "D", status: "PASS" }, { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 0, grade: "F", status: "FAIL" }, { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "C", status: "PASS" }, { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "D", status: "PASS" }, { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "A", status: "PASS" }, { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 0, grade: "-Ab-", status: "FAIL" }, { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "B", status: "PASS" }] },
+      "25G01A4302": { rollNumber: "25G01A4302", name: "A G JAMUNA", branch: "Artificial Intelligence (AI)", yearSem: "B.Tech I Year - I Semester", status: "PASSED", sgpa: 7.69, subjects: [{ code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "C", status: "PASS" }, { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "C", status: "PASS" }, { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "B", status: "PASS" }, { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "B", status: "PASS" }, { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "D", status: "PASS" }, { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "A", status: "PASS" }, { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "S", status: "PASS" }, { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "A", status: "PASS" }, { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "B", status: "PASS" }, { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "A", status: "PASS" }] },
+      "25G01A4304": { rollNumber: "25G01A4304", name: "A P YAMINI", branch: "Artificial Intelligence (AI)", yearSem: "B.Tech I Year - I Semester", status: "PASSED", sgpa: 7.69, subjects: [{ code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "B", status: "PASS" }, { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "B", status: "PASS" }, { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "D", status: "PASS" }, { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "C", status: "PASS" }, { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "C", status: "PASS" }, { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "A", status: "PASS" }, { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "A", status: "PASS" }, { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "S", status: "PASS" }, { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "B", status: "PASS" }, { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "S", status: "PASS" }] },
+      "25G01A4326": { rollNumber: "25G01A4326", name: "C S PRAVALIKA", branch: "Artificial Intelligence (AI)", yearSem: "B.Tech I Year - I Semester", status: "PASSED", sgpa: 9.13, subjects: [{ code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "A", status: "PASS" }, { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "B", status: "PASS" }, { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "S", status: "PASS" }, { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "B", status: "PASS" }, { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "A", status: "PASS" }, { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "S", status: "PASS" }, { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "S", status: "PASS" }, { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "S", status: "PASS" }, { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "S", status: "PASS" }, { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "S", status: "PASS" }] },
+      "25G01A4327": { rollNumber: "25G01A4327", name: "CHADALAVADA YASASWINI", branch: "Artificial Intelligence (AI)", yearSem: "B.Tech I Year - I Semester", status: "PASSED", sgpa: 7.29, subjects: [] }
+    };
+
+    function searchResult() {
+        const input = document.getElementById('rollInput').value.trim().toUpperCase();
+        const errorMsg = document.getElementById('errorMsg');
+        const resultCard = document.getElementById('resultCard');
+
+        if (STUDENT_DATABASE[input]) {
+            const student = STUDENT_DATABASE[input];
+            errorMsg.style.display = 'none';
+
+            document.getElementById('studentName').innerText = student.name;
+            document.getElementById('studentRoll').innerText = student.rollNumber;
+            document.getElementById('studentBranch').innerText = student.branch;
+            document.getElementById('studentSGPA').innerText = student.sgpa;
+            
+            const statusSpan = document.getElementById('studentStatus');
+            statusSpan.innerText = student.status;
+            statusSpan.className = `badge-${student.status}`;
+
+            const tbody = document.getElementById('subjectsTable');
+            tbody.innerHTML = '';
+
+            if (student.subjects && student.subjects.length > 0) {
+                student.subjects.forEach(sub => {
+                    const row = `<tr>
+                        <td>${sub.code}</td>
+                        <td>${sub.name}</td>
+                        <td>${sub.credits}</td>
+                        <td>${sub.grade}</td>
+                        <td class="status-${sub.status}">${sub.status}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No subject details available.</td></tr>';
+            }
+
+            resultCard.style.display = 'block';
+        } else {
+            resultCard.style.display = 'none';
+            errorMsg.style.display = 'block';
+        }
+    }
+</script>
 
 </body>
 </html>
