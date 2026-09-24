@@ -3,15 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVPCET - Student Examination Portal</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- React & Babel CDN to run JSX directly on GitHub Pages -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <title>SVPCET Autonomous - B.Tech Examination Results Portal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM CDNs -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+      body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen text-slate-800 antialiased">
     <div id="root"></div>
-    <script type="text/babel" src="main.js"></script>
+
+    <!-- Combined React Component & Mount Script -->
+    <script type="text/babel">
+      const { useState } = React;
+
+      // Student Database
+      const STUDENT_DATABASE = {
+        "25G01A4301": {
+          rollNumber: "25G01A4301",
+          name: "A B SURESH",
+          branch: "Artificial Intelligence (AI)",
+          yearSem: "B.Tech I Year - I Semester",
+          regulation: "R23",
+          college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
+          status: "FAILED",
+          sgpa: 4.03,
+          cgpa: 4.03,
+          subjects: [
+            { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", internal: 22, external: 20, total: 42, credits: 0, grade: "F", status: "FAIL" },
+            { code: "23BS0005", name: "CHEMISTRY", internal: 17, external: 32, total: 49, credits: 3, grade: "E", status: "PASS" },
+            { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", internal: 16, external: 25, total: 41, credits: 3, grade: "E", status: "PASS" }
+          ]
+        },
+        "25G01A4302": {
+          rollNumber: "25G01A4302",
+          name: "A G JAMUNA",
+          branch: "Artificial Intelligence (AI)",
+          yearSem: "B.Tech I Year - I Semester",
+          regulation: "R23",
+          college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
+          status: "PASSED",
+          sgpa: 7.69,
+          cgpa: 7.69,
+          subjects: [
+            { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", internal: 25, external: 43, total: 68, credits: 2, grade: "C", status: "PASS" },
+            { code: "23BS0005", name: "CHEMISTRY", internal: 25, external: 41, total: 66, credits: 3, grade: "C", status: "PASS" }
+          ]
+        }
+      };
+
+      function App() {
+        const [searchInput, setSearchInput] = useState('');
+        const [resultData, setResultData] = useState(null);
+        const [errorMsg, setErrorMsg] = useState('');
+
+        const handleSearch = (e) => {
+          e.preventDefault();
+          const cleanRoll = searchInput.trim().toUpperCase();
+          if (STUDENT_DATABASE[cleanRoll]) {
+            setResultData(STUDENT_DATABASE[cleanRoll]);
+            setErrorMsg('');
+          } else {
+            setErrorMsg(`No examination records found for Roll Number: "${cleanRoll}".`);
+            setResultData(null);
+          }
+        };
+
+        return (
+          <div className="p-8 max-w-4xl mx-auto">
+            <h1 className="text-2xl font-bold mb-4">SVPCET Results Portal</h1>
+            <form onSubmit={handleSearch} className="flex gap-2 mb-6">
+              <input
+                type="text"
+                placeholder="Enter Roll Number (e.g. 25G01A4302)"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="border p-2 rounded flex-1"
+              />
+              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Search</button>
+            </form>
+
+            {errorMsg && <p className="text-red-500 font-semibold">{errorMsg}</p>}
+
+            {resultData && (
+              <div className="bg-white p-6 rounded shadow">
+                <h2 className="text-xl font-bold">{resultData.name} ({resultData.rollNumber})</h2>
+                <p className="text-sm text-gray-600">{resultData.branch} - {resultData.status}</p>
+                <div className="mt-4">
+                  <span className="font-bold">SGPA: {resultData.sgpa}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      // Render App
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
 </body>
 </html>
