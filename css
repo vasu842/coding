@@ -1,34 +1,134 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
 body {
-    font-family: 'Inter', sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
 }
 
-/* Custom scrollbar for table container */
-.overflow-x-auto::-webkit-scrollbar {
-    height: 6px;
+.portal-header {
+    background-color: #002b49;
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 4px solid #f39c12;
 }
-.overflow-x-auto::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
+
+.portal-header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.portal-header p {
+    font-size: 0.95rem;
+    color: #d1d8e0;
+}
+
+.nav-tabs {
+    display: flex;
+    justify-content: center;
+    background-color: #001f35;
+}
+
+.nav-tabs button {
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 12px 24px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.nav-tabs button.active {
+    background-color: #f39c12;
+    color: #000;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.search-box {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    justify-content: center;
+}
+
+.search-box input, .search-box select {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 1rem;
 }
 
-/* Print Optimization Styles */
-@media print {
-    body {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-    .print\:hidden {
-        display: none !important;
-    }
-    .print\:shadow-none {
-        box-shadow: none !important;
-    }
-    .print\:border-none {
-        border: none !important;
-    }
-    .print\:p-0 {
-        padding: 0 !important;
-    }
+.search-box button {
+    padding: 10px 20px;
+    background-color: #002b49;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.search-box button:hover {
+    background-color: #00406c;
+}
+
+.info-card {
+    background-color: #eef2f5;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.results-table th, .results-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.results-table th {
+    background-color: #002b49;
+    color: white;
+}
+
+.status-pass {
+    color: green;
+    font-weight: bold;
+}
+
+.status-fail {
+    color: red;
+    font-weight: bold;
+}
+
+.error-msg {
+    color: red;
+    text-align: center;
+    margin: 15px 0;
 }
