@@ -1,453 +1,425 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVPCET B.Tech Results Portal</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel standalone for browser JSX compilation -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Department Attendance & Timetable Portal</title>
+  
+  <!-- React & Babel CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f1f5f9; color: #1e293b; padding: 20px; }
+    .portal-container { max-width: 1200px; margin: 0 auto; background: #ffffff; padding: 28px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+    .header-title { font-size: 24px; font-weight: 700; color: #0f172a; }
+    .header-sub { font-size: 14px; color: #64748b; margin-top: 4px; }
+    
+    .tabs-nav { display: flex; gap: 8px; margin-top: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 2px; }
+    .tab-btn { padding: 10px 18px; border: none; background: transparent; font-size: 14px; font-weight: 600; color: #64748b; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; }
+    .tab-btn.active { color: #2563eb; background-color: #eff6ff; border-bottom: 2px solid #2563eb; }
+    
+    .selector-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 20px 0; }
+    .control-group { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+    .select-label { font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px; }
+    .custom-select, .search-input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; background-color: #ffffff; }
+    .custom-select:focus, .search-input:focus { border-color: #2563eb; }
+    
+    .active-period-info { background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 14px; margin-top: 12px; border-radius: 0 6px 6px 0; font-size: 13px; color: #1e3a8a; }
+    
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .data-table th, .data-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+    .data-table th { background-color: #f8fafc; color: #475569; font-weight: 600; }
+    
+    .timetable-table td.active-slot { background-color: #dbeafe; font-weight: bold; }
+    .slot-code { font-weight: 700; color: #1e293b; }
+    .slot-teacher { font-size: 11px; color: #64748b; margin-top: 2px; }
+    
+    .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }
+    .badge-present { background-color: #dcfce7; color: #15803d; }
+    .badge-absent { background-color: #fee2e2; color: #b91c1c; }
+    .badge-suppressed { background-color: #fef3c7; color: #b45309; }
+    .badge-sent { background-color: #fee2e2; color: #b91c1c; }
+    
+    .action-dropdown { padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #f8fafc; font-size: 13px; color: #1e293b; cursor: pointer; outline: none; }
+    .btn-secondary { padding: 8px 14px; background-color: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #334155; }
+    .btn-secondary:hover { background-color: #cbd5e1; }
+    
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+    .faculty-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; background: #ffffff; }
+    .faculty-name { font-weight: 700; color: #0f172a; font-size: 15px; }
+    .faculty-subject { font-size: 13px; color: #2563eb; margin: 4px 0; font-weight: 600; }
+    .faculty-phone { font-size: 12px; color: #64748b; }
+  </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 antialiased">
-    <div id="root"></div>
+<body>
+  <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState } = React;
+  <script type="text/babel">
+    const teachers = [
+      { subCode: "23BS0006", subName: "Discrete Mathematics and Graph Theory (DMGT)", teacher: "Mrs. S. SaiGeetha", phone: "8297112259" },
+      { subCode: "23HM0002", subName: "Universal Human Values 2 (UHV)", teacher: "Mrs. V. P. Rohini", phone: "8309508517" },
+      { subCode: "23PC4301", subName: "Artificial Intelligence (AI)", teacher: "V. Janardhan Babu", phone: "N/A" },
+      { subCode: "23PC0503", subName: "Advanced Data Structures and Algorithms (ADSA)", teacher: "Ms. H. Nazeema", phone: "8374946620" },
+      { subCode: "23PC0504", subName: "Object Oriented Programming Through JAVA (OOPJ)", teacher: "Mrs. N. Sridevi", phone: "9493324549" },
+      { subCode: "23LC0504", subName: "ADSA Lab", teacher: "Ms. H. Nazeema", phone: "8374946620" },
+      { subCode: "23LC0505", subName: "OOPJ Lab", teacher: "Mrs. N. Sridevi", phone: "9493324549" },
+      { subCode: "23SE0501", subName: "Python Programming (PP)", teacher: "Mrs. K. Hemavathi", phone: "9347142967" },
+      { subCode: "23MC0001", subName: "Environmental Science (ES)", teacher: "Mr. Dr. P. Vinod Kumar", phone: "8500951282" }
+    ];
 
-        const STUDENT_DATABASE = {
-          "25G01A4301": {
-            rollNumber: "25G01A4301",
-            name: "A B SURESH",
-            branch: "Artificial Intelligence (AI)",
-            yearSem: "B.Tech I Year - I Semester",
-            regulation: "R23",
-            college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
-            status: "FAILED",
-            sgpa: 4.03,
-            cgpa: 4.03,
-            subjects: [
-              { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 0, grade: "F", status: "FAIL" },
-              { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "E", status: "PASS" },
-              { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "E", status: "PASS" },
-              { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "D", status: "PASS" },
-              { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 0, grade: "F", status: "FAIL" },
-              { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "C", status: "PASS" },
-              { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "D", status: "PASS" },
-              { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 0, grade: "-Ab-", status: "FAIL" },
-              { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "B", status: "PASS" }
-            ]
-          },
-          "25G01A4302": {
-            rollNumber: "25G01A4302",
-            name: "A G JAMUNA",
-            branch: "Artificial Intelligence (AI)",
-            yearSem: "B.Tech I Year - I Semester",
-            regulation: "R23",
-            college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
-            status: "PASSED",
-            sgpa: 7.69,
-            cgpa: 7.69,
-            subjects: [
-              { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "C", status: "PASS" },
-              { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "C", status: "PASS" },
-              { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "B", status: "PASS" },
-              { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "B", status: "PASS" },
-              { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "D", status: "PASS" },
-              { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "A", status: "PASS" },
-              { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "S", status: "PASS" },
-              { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "B", status: "PASS" },
-              { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "A", status: "PASS" }
-            ]
-          },
-          "25G01A4303": {
-            rollNumber: "25G01A4303",
-            name: "A KAVYA",
-            branch: "Artificial Intelligence (AI)",
-            yearSem: "B.Tech I Year - I Semester",
-            regulation: "R23",
-            college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
-            status: "PASSED",
-            sgpa: 8.12,
-            cgpa: 8.12,
-            subjects: [
-              { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "B", status: "PASS" },
-              { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "B", status: "PASS" },
-              { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "A", status: "PASS" },
-              { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "B", status: "PASS" },
-              { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "C", status: "PASS" },
-              { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "A", status: "PASS" },
-              { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "S", status: "PASS" },
-              { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "S", status: "PASS" },
-              { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "A", status: "PASS" }
-            ]
-          },
-          "25G01A4304": {
-            rollNumber: "25G01A4304",
-            name: "A NITHIN",
-            branch: "Artificial Intelligence (AI)",
-            yearSem: "B.Tech I Year - I Semester",
-            regulation: "R23",
-            college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
-            status: "FAILED",
-            sgpa: 5.25,
-            cgpa: 5.25,
-            subjects: [
-              { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "D", status: "PASS" },
-              { code: "23BS0005", name: "CHEMISTRY", credits: 0, grade: "F", status: "FAIL" },
-              { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "E", status: "PASS" },
-              { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "D", status: "PASS" },
-              { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 0, grade: "F", status: "FAIL" },
-              { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "B", status: "PASS" },
-              { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "C", status: "PASS" },
-              { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "B", status: "PASS" },
-              { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "C", status: "PASS" },
-              { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "B", status: "PASS" }
-            ]
-          },
-          "25G01A4305": {
-            rollNumber: "25G01A4305",
-            name: "A S REVANTH",
-            branch: "Artificial Intelligence (AI)",
-            yearSem: "B.Tech I Year - I Semester",
-            regulation: "R23",
-            college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
-            status: "PASSED",
-            sgpa: 7.45,
-            cgpa: 7.45,
-            subjects: [
-              { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "C", status: "PASS" },
-              { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "C", status: "PASS" },
-              { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "B", status: "PASS" },
-              { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "C", status: "PASS" },
-              { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "B", status: "PASS" },
-              { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "A", status: "PASS" },
-              { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "A", status: "PASS" },
-              { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "B", status: "PASS" },
-              { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "B", status: "PASS" }
-            ]
-          },
-          "25G01A4306": {
-            rollNumber: "25G01A4306",
-            name: "A THIRUMALESH",
-            branch: "Artificial Intelligence (AI)",
-            yearSem: "B.Tech I Year - I Semester",
-            regulation: "R23",
-            college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
-            status: "PASSED",
-            sgpa: 8.30,
-            cgpa: 8.30,
-            subjects: [
-              { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "B", status: "PASS" },
-              { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "A", status: "PASS" },
-              { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "A", status: "PASS" },
-              { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "B", status: "PASS" },
-              { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "B", status: "PASS" },
-              { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "A", status: "PASS" },
-              { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "S", status: "PASS" },
-              { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "S", status: "PASS" },
-              { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "A", status: "PASS" }
-            ]
-          },
-          "25G01A4307": {
-            rollNumber: "25G01A4307",
-            name: "AAVULA DHARANI YADAV",
-            branch: "Artificial Intelligence (AI)",
-            yearSem: "B.Tech I Year - I Semester",
-            regulation: "R23",
-            college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
-            status: "PASSED",
-            sgpa: 8.85,
-            cgpa: 8.85,
-            subjects: [
-              { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "A", status: "PASS" },
-              { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "A", status: "PASS" },
-              { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "A", status: "PASS" },
-              { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "B", status: "PASS" },
-              { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "B", status: "PASS" },
-              { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "A", status: "PASS" },
-              { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "S", status: "PASS" },
-              { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "S", status: "PASS" },
-              { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "S", status: "PASS" }
-            ]
-          },
-          "25G01A4308": {
-            rollNumber: "25G01A4308",
-            name: "ABBINENI BHARATH",
-            branch: "Artificial Intelligence (AI)",
-            yearSem: "B.Tech I Year - I Semester",
-            regulation: "R23",
-            college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
-            status: "PASSED",
-            sgpa: 7.90,
-            cgpa: 7.90,
-            subjects: [
-              { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "B", status: "PASS" },
-              { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "C", status: "PASS" },
-              { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "B", status: "PASS" },
-              { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "B", status: "PASS" },
-              { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "C", status: "PASS" },
-              { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "A", status: "PASS" },
-              { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "A", status: "PASS" },
-              { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "A", status: "PASS" }
-            ]
-          },
-          "25G01A4309": {
-            rollNumber: "25G01A4309",
-            name: "ADDAGIRI CHARAN",
-            branch: "Artificial Intelligence (AI)",
-            yearSem: "B.Tech I Year - I Semester",
-            regulation: "R23",
-            college: "Sri Venkatesa Perumal College of Engineering & Technology (AUTONOMOUS)",
-            status: "PASSED",
-            sgpa: 8.52,
-            cgpa: 8.52,
-            subjects: [
-              { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 2, grade: "A", status: "PASS" },
-              { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "B", status: "PASS" },
-              { code: "23BS0001", name: "LINEAR ALGEBRA & CALCULUS", credits: 3, grade: "A", status: "PASS" },
-              { code: "23ES0101", name: "BASIC CIVIL & MECHANICAL ENGINEERING", credits: 3, grade: "A", status: "PASS" },
-              { code: "23ES0501", name: "INTRODUCTION TO PROGRAMMING", credits: 3, grade: "B", status: "PASS" },
-              { code: "23LC0001", name: "COMMUNICATIVE ENGLISH LAB", credits: 1, grade: "S", status: "PASS" },
-              { code: "23LC0004", name: "CHEMISTRY LAB", credits: 1, grade: "S", status: "PASS" },
-              { code: "23LC0301", name: "ENGINEERING WORKSHOP", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23LC0501", name: "COMPUTER PROGRAMMING LAB", credits: 1.5, grade: "A", status: "PASS" },
-              { code: "23HM0002", name: "HEALTH AND WELLNESS, YOGA AND SPORTS", credits: 0.5, grade: "S", status: "PASS" }
-            ]
-          }
-        };
+    const timetable = {
+      MON: ["OOP1", "ADS1", "DMGT1", "ADS2", "AI1", "OOP2", "OOP3"],
+      TUE: ["AI2", "ES1", "DMGT2", "PP LAB", "PP LAB", "PP LAB", "—"],
+      WED: ["ADS3", "DMGT3", "UHV1", "ADS4", "AI3", "OOP4", "UHV3"],
+      THU: ["OOP LAB", "OOP LAB", "OOP LAB", "OOP5", "DMGT4", "ADS5", "PP"],
+      FRI: ["UHV", "ES2", "DMGT5", "AI4", "ADS LAB", "ADS LAB", "ADS LAB"]
+    };
 
-        function App() {
-          const [searchInput, setSearchInput] = useState('');
-          const [selectedSem, setSelectedSem] = useState('1-1');
-          const [resultData, setResultData] = useState(null);
-          const [errorMsg, setErrorMsg] = useState('');
+    const periodTimes = [
+      "9:30 AM", "10:20 AM", "11:10 AM", "12:50 PM", "1:40 PM", "2:30 PM", "3:20 PM"
+    ];
 
-          const handleSearch = (e) => {
-            e.preventDefault();
-            const cleanRoll = searchInput.trim().toUpperCase();
+    const initialStudents = [
+      { rollNo: "25G01A4301", name: "A B Suresh", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4302", name: "A G Jamuna", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4303", name: "A M Dhanush", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4304", name: "A P Yamini", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4305", name: "A Preethi", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4306", name: "A Vishnuvardhan", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4307", name: "Avula Dharani Yadav", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4308", name: "Alluganti Varun Kumar Reddy", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4309", name: "Ambati Ajuri Lakshmi Poojitha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4310", name: "Andhi Naga Pranathi", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4311", name: "Angiteela Bhavana", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4312", name: "Arava Soujanya", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4313", name: "Ardhamala Sasi Kumar", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4314", name: "Attukara Yagnitha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4315", name: "Ayyappa Yuvansankar", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4316", name: "B Jhansi", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4317", name: "B Shalini", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4318", name: "Bala Kowshik Yadav", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4319", name: "Batti Sivakesavulu", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4320", name: "Bodireddy Lohitha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4321", name: "Borra Lalasa", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4322", name: "Boya Venu", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4323", name: "Budaga Vinod", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4324", name: "Busupalli Arun Kumar Reddy", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4325", name: "C Dilli Babu", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4326", name: "C S Pravalika", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4327", name: "Chadalavada Yasaswini", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4328", name: "Chilla Praveen", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4329", name: "Chinnagovindappagari Divya", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4330", name: "Chitambalam Vamsikrishna", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4331", name: "Chittemreddy Rajesh Reddy", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4332", name: "Chittooru Gereeshma", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4333", name: "D Sindhu", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4334", name: "Dasari Praveen Babu", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4335", name: "Devalla Gunasri", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4336", name: "Devarakonda Mohith", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4337", name: "Dhantla Harika", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4338", name: "Dondu Lalithkumar", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4339", name: "Dongara Venu", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4340", name: "Dudekula Basheer", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4341", name: "Dugguluru Spandana", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4342", name: "E Rushitha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4343", name: "Erasappa Rakshitha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4344", name: "G Chethan", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4345", name: "Gajjappagari Siddartha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4346", name: "Ganaparthi Mounika", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4347", name: "Gandla Dhanalakshmi", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4348", name: "Ganga Ranga Swamy", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4349", name: "Ganji Jasvanth Reddy", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4350", name: "Gattu Dhanush", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4351", name: "Giddaluru Ganga Vyshnavi", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4352", name: "Gude Harshitha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4353", name: "Gummakonda Sathish Kumar", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4354", name: "Gunduru Pavani", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4355", name: "Gurramkonda Bharath Reddy", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4356", name: "Hemachandran Gangothri", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4357", name: "Indukuri Prem Swaroop", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4358", name: "K Divya", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4359", name: "K G Jansi Rani", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4360", name: "Kasanuru Siddartha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4361", name: "Kamalapadu Anand", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4362", name: "K. Lakshmi Prasanna", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4363", name: "Kamasani Yaswani", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4364", name: "Kamini Shireesha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4365", name: "Kanapala Jahnavi", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4366", name: "Kanaparthi Amulya", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4367", name: "Kandi Charanteja", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4368", name: "Karpurapu Sri Pavani", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4369", name: "Kattubadi Kiran Kumar", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4370", name: "Keelapudi Vasudeva", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4371", name: "Keesalam Pavani", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4372", name: "Koneru Jahnavi", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4373", name: "Koppala Lohitha", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4374", name: "Kothapalli Sahithya", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4375", name: "K. Vijaykumar", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4376", name: "K. Manjunadh", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4377", name: "K. Sai Vennela", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4378", name: "K. Praveen Kumar Reddy", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4379", name: "K. Venkatesulu", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4380", name: "K. Sonal", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4381", name: "M. Ajay Kumar", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4382", name: "M. Giriprasad", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4383", name: "M.K. Govinda Swamy", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4384", name: "M.M. Surya", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4385", name: "M. Madhavi", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4386", name: "M. Mahalakshmi", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4387", name: "M. Manohar", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "25G01A4388", name: "M. Megala", department: "AI", status: "Present", notifyParent: true },
+      { rollNo: "LE1", name: "G. Lohith", department: "AI (LE)", status: "Present", notifyParent: true },
+      { rollNo: "LE2", name: "T. Veera Siddu Sree", department: "AI (LE)", status: "Present", notifyParent: true },
+      { rollNo: "LE3", name: "K. Soumya", department: "AI (LE)", status: "Present", notifyParent: true },
+      { rollNo: "LE4", name: "P. Siri", department: "AI (LE)", status: "Present", notifyParent: true }
+    ];
 
-            if (!cleanRoll) {
-              setErrorMsg('Please enter a valid Hall Ticket / Roll Number.');
-              setResultData(null);
-              return;
-            }
+    function App() {
+      const [activeTab, setActiveTab] = React.useState('attendance');
+      const [selectedDay, setSelectedDay] = React.useState('MON');
+      const [selectedPeriodIndex, setSelectedPeriodIndex] = React.useState(0);
+      const [searchTerm, setSearchTerm] = React.useState('');
 
-            if (STUDENT_DATABASE[cleanRoll]) {
-              setResultData(STUDENT_DATABASE[cleanRoll]);
-              setErrorMsg('');
-            } else {
-              setErrorMsg(`No B.Tech examination records found for Roll Number: "${cleanRoll}".`);
-              setResultData(null);
-            }
-          };
-
-          const handleReset = () => {
-            setSearchInput('');
-            setResultData(null);
-            setErrorMsg('');
-          };
-
-          return (
-            <div className="min-h-screen flex flex-col justify-between">
-              <header className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-lg print:hidden">
-                <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-14 h-14 bg-white text-blue-900 rounded-full flex items-center justify-center font-extrabold text-2xl shadow-inner border-2 border-amber-400">
-                      SV
-                    </div>
-                    <div>
-                      <h1 className="text-xl md:text-2xl font-black tracking-wide">SVPCET EXAMINATION PORTAL</h1>
-                      <p className="text-xs text-blue-200 mt-0.5">Sri Venkatesa Perumal College Results Engine & Marks Memo</p>
-                    </div>
-                  </div>
-                  <div className="bg-blue-800/60 border border-blue-700/50 rounded-xl px-4 py-2 text-center md:text-right">
-                    <span className="text-xs text-amber-300 font-semibold uppercase tracking-wider block">Academic Session</span>
-                    <span className="text-sm font-bold text-white">B.Tech R23 Regular Results</span>
-                  </div>
-                </div>
-              </header>
-
-              <main className="flex-grow max-w-5xl w-full mx-auto px-4 py-8">
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 print:hidden">
-                  <h2 className="text-lg font-bold text-slate-800 mb-1">Check Examination Results</h2>
-                  <p className="text-xs text-slate-500 mb-6">Enter your 10-digit Hall Ticket Number to retrieve your B.Tech mark statement.</p>
-
-                  <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-600 uppercase mb-2">Select Semester</label>
-                      <select
-                        value={selectedSem}
-                        onChange={(e) => setSelectedSem(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                      >
-                        <option value="1-1">B.Tech I Year I Semester (1-1 R23)</option>
-                        <option value="2-1">B.Tech II Year I Semester (2-1 R20)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-600 uppercase mb-2">Hall Ticket / Roll Number</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. 25G01A4301 or 25G01A4309"
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 uppercase focus:outline-none focus:ring-2 focus:ring-blue-600"
-                      />
-                    </div>
-
-                    <div className="flex items-end gap-2">
-                      <button
-                        type="submit"
-                        className="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition duration-150 shadow-md text-sm"
-                      >
-                        Get Results
-                      </button>
-                      {resultData && (
-                        <button
-                          type="button"
-                          onClick={handleReset}
-                          className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-xl transition text-sm"
-                        >
-                          Clear
-                        </button>
-                      )}
-                    </div>
-                  </form>
-
-                  <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                    <span className="font-semibold">Sample Roll Numbers:</span>
-                    <button onClick={() => setSearchInput("25G01A4301")} className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-mono hover:underline">25G01A4301</button>
-                    <button onClick={() => setSearchInput("25G01A4302")} className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-mono hover:underline">25G01A4302</button>
-                    <button onClick={() => setSearchInput("25G01A4307")} className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-mono hover:underline">25G01A4307</button>
-                    <button onClick={() => setSearchInput("25G01A4309")} className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-mono hover:underline">25G01A4309</button>
-                  </div>
-                </div>
-
-                {errorMsg && (
-                  <div className="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl mb-8 flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-rose-600 font-bold text-lg">⚠️</span>
-                      <p className="text-sm font-semibold text-rose-800">{errorMsg}</p>
-                    </div>
-                  </div>
-                )}
-
-                {resultData && (
-                  <div className="bg-white rounded-2xl shadow-md border border-slate-300 overflow-hidden print:shadow-none print:border-none">
-                    <div className="bg-slate-900 text-white p-6 border-b-4 border-amber-400">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h2 className="text-xl md:text-2xl font-black tracking-tight">{resultData.college}</h2>
-                          <p className="text-xs text-slate-300 mt-1 uppercase font-semibold tracking-wider">Official Grade Report & Statement of Marks</p>
-                        </div>
-                        <button
-                          onClick={() => window.print()}
-                          className="print:hidden bg-amber-400 hover:bg-amber-500 text-slate-950 px-4 py-2 rounded-lg font-bold text-xs shadow-sm transition"
-                        >
-                          🖨️ Print Result Memo
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="p-6 bg-slate-50/50 border-b border-slate-200">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
-                        <div className="flex justify-between border-b border-slate-200 pb-2">
-                          <span className="text-slate-500 font-medium">Student Name:</span>
-                          <span className="font-bold text-slate-900">{resultData.name}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-slate-200 pb-2">
-                          <span className="text-slate-500 font-medium">Roll Number:</span>
-                          <span className="font-mono font-bold text-blue-700">{resultData.rollNumber}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-slate-200 pb-2">
-                          <span className="text-slate-500 font-medium">Branch / Course:</span>
-                          <span className="font-semibold text-slate-800">{resultData.branch}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-slate-200 pb-2">
-                          <span className="text-slate-500 font-medium">Semester / Reg:</span>
-                          <span className="font-semibold text-slate-800">{resultData.yearSem} ({resultData.regulation})</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-6 overflow-x-auto">
-                      <table className="w-full text-left border-collapse text-xs md:text-sm">
-                        <thead>
-                          <tr className="bg-slate-100 text-slate-700 uppercase font-bold border-b-2 border-slate-300">
-                            <th className="py-3 px-4">Subject Code</th>
-                            <th className="py-3 px-4">Subject Title</th>
-                            <th className="py-3 px-4 text-center">Credits</th>
-                            <th className="py-3 px-4 text-center">Grade</th>
-                            <th className="py-3 px-4 text-center">Result</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200 font-medium text-slate-800">
-                          {resultData.subjects.map((sub, idx) => (
-                            <tr key={idx} className="hover:bg-slate-50">
-                              <td className="py-3 px-4 font-mono text-slate-600">{sub.code}</td>
-                              <td className="py-3 px-4 font-semibold">{sub.name}</td>
-                              <td className="py-3 px-4 text-center">{sub.credits}</td>
-                              <td className="py-3 px-4 text-center font-bold text-indigo-700">{sub.grade}</td>
-                              <td className="py-3 px-4 text-center">
-                                <span className={`px-2 py-1 rounded text-xs font-bold ${sub.status === 'PASS' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
-                                  {sub.status}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="p-6 bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-4">
-                      <div className="flex items-center space-x-6">
-                        <div>
-                          <span className="text-xs text-slate-400 uppercase font-semibold block">Semester SGPA</span>
-                          <span className="text-2xl font-black text-amber-400">{resultData.sgpa}</span>
-                        </div>
-                        <div className="border-l border-slate-700 pl-6">
-                          <span className="text-xs text-slate-400 uppercase font-semibold block">Cumulative CGPA</span>
-                          <span className="text-2xl font-black text-blue-400">{resultData.cgpa}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3">
-                        <span className="text-xs uppercase font-semibold text-slate-400">Overall Result Status:</span>
-                        <span className={`font-black px-4 py-2 rounded-lg text-sm tracking-wide ${resultData.status === 'PASSED' ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white'}`}>
-                          {resultData.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </main>
-
-              <footer className="bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800 print:hidden">
-                <p>© 2026 SVPCET Examination Cell. All Rights Reserved.</p>
-              </footer>
-            </div>
-          );
+      const [attendanceRecords, setAttendanceRecords] = React.useState(() => {
+        const saved = localStorage.getItem('ai_period_attendance_data');
+        if (saved) {
+          try { return JSON.parse(saved); } catch (e) { console.error(e); }
         }
+        
+        const initial = {};
+        Object.keys(timetable).forEach(day => {
+          initial[day] = {};
+          for (let i = 0; i < 7; i++) {
+            initial[day][i] = initialStudents.map(s => ({ ...s }));
+          }
+        });
+        return initial;
+      });
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+      React.useEffect(() => {
+        localStorage.setItem('ai_period_attendance_data', JSON.stringify(attendanceRecords));
+      }, [attendanceRecords]);
+
+      const currentSubjectCode = timetable[selectedDay]?.[selectedPeriodIndex] || "N/A";
+      
+      const getTeacherForCode = (code) => {
+        if (code.includes("DMGT")) return teachers[0];
+        if (code.includes("UHV")) return teachers[1];
+        if (code.includes("AI")) return teachers[2];
+        if (code.includes("ADS LAB")) return teachers[5];
+        if (code.includes("ADS")) return teachers[3];
+        if (code.includes("OOP LAB")) return teachers[6];
+        if (code.includes("OOP")) return teachers[4];
+        if (code.includes("PP")) return teachers[7];
+        if (code.includes("ES")) return teachers[8];
+        return { teacher: "Faculty", subName: code };
+      };
+
+      const currentTeacher = getTeacherForCode(currentSubjectCode);
+      const currentStudents = attendanceRecords[selectedDay]?.[selectedPeriodIndex] || initialStudents;
+
+      const handleAction = (rollNo, action) => {
+        setAttendanceRecords(prev => {
+          const updatedDay = { ...prev[selectedDay] };
+          const updatedPeriod = updatedDay[selectedPeriodIndex].map(student => {
+            if (student.rollNo !== rollNo) return student;
+            if (action === 'plan_a') return { ...student, status: 'Absent', notifyParent: false };
+            if (action === 'plan_b') return { ...student, status: 'Present', notifyParent: true };
+            if (action === 'standard') return { ...student, status: 'Absent', notifyParent: true };
+            return student;
+          });
+          updatedDay[selectedPeriodIndex] = updatedPeriod;
+          return { ...prev, [selectedDay]: updatedDay };
+        });
+      };
+
+      const setAllStatus = (status) => {
+        setAttendanceRecords(prev => {
+          const updatedDay = { ...prev[selectedDay] };
+          updatedDay[selectedPeriodIndex] = updatedDay[selectedPeriodIndex].map(s => ({
+            ...s,
+            status: status,
+            notifyParent: status === 'Present' ? true : s.notifyParent
+          }));
+          return { ...prev, [selectedDay]: updatedDay };
+        });
+      };
+
+      const filteredStudents = currentStudents.filter(
+        s => s.rollNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             s.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      return (
+        <div className="portal-container">
+          <div className="header">
+            <h1 className="header-title">College Attendance & Timetable Portal</h1>
+            <p className="header-sub">
+              Department of Artificial Intelligence (AI) — II B.Tech I SEM (A-Section) LH 203
+            </p>
+          </div>
+
+          <div className="tabs-nav">
+            <button className={`tab-btn ${activeTab === 'attendance' ? 'active' : ''}`} onClick={() => setActiveTab('attendance')}>
+              Mark Attendance
+            </button>
+            <button className={`tab-btn ${activeTab === 'timetable' ? 'active' : ''}`} onClick={() => setActiveTab('timetable')}>
+              Class Timetable
+            </button>
+            <button className={`tab-btn ${activeTab === 'teachers' ? 'active' : ''}`} onClick={() => setActiveTab('teachers')}>
+              Faculty Directory
+            </button>
+          </div>
+
+          {activeTab === 'attendance' && (
+            <div>
+              <div className="selector-card">
+                <div className="control-group">
+                  <div>
+                    <label className="select-label">Select Day:</label>
+                    <select className="custom-select" value={selectedDay} onChange={e => setSelectedDay(e.target.value)}>
+                      {Object.keys(timetable).map(day => <option key={day} value={day}>{day}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="select-label">Select Period:</label>
+                    <select className="custom-select" value={selectedPeriodIndex} onChange={e => setSelectedPeriodIndex(Number(e.target.value))}>
+                      {periodTimes.map((time, idx) => (
+                        <option key={idx} value={idx}>
+                          Period {idx + 1} ({time})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div style={{ flexGrow: 1 }}>
+                    <label className="select-label">Search Student:</label>
+                    <input
+                      type="text"
+                      className="search-input"
+                      placeholder="Roll No or Student Name..."
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                      style={{ width: '100%' }}
+                    />
+                  </div>
+
+                  <div style={{ alignSelf: 'flex-end', display: 'flex', gap: '8px' }}>
+                    <button className="btn-secondary" onClick={() => setAllStatus('Present')}>Mark All Present</button>
+                    <button className="btn-secondary" onClick={() => setAllStatus('Absent')}>Mark All Absent</button>
+                  </div>
+                </div>
+
+                <div className="active-period-info">
+                  <strong>Period {selectedPeriodIndex + 1}:</strong> {currentSubjectCode} — {currentTeacher.subName || 'Subject'} | 
+                  <strong> Teacher:</strong> {currentTeacher.teacher} ({currentTeacher.phone})
+                </div>
+              </div>
+
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Roll No</th>
+                    <th>Student Name</th>
+                    <th>Dept</th>
+                    <th>Status</th>
+                    <th>Parent Alert</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredStudents.map((student) => (
+                    <tr key={student.rollNo}>
+                      <td><strong>{student.rollNo}</strong></td>
+                      <td>{student.name}</td>
+                      <td>{student.department}</td>
+                      <td>
+                        <span className={`badge ${student.status === 'Present' ? 'badge-present' : 'badge-absent'}`}>
+                          {student.status}
+                        </span>
+                      </td>
+                      <td>
+                        {student.status === 'Absent' ? (
+                          student.notifyParent ? (
+                            <span className="badge badge-sent">SMS Sent</span>
+                          ) : (
+                            <span className="badge badge-suppressed">Plan A: Suppressed</span>
+                          )
+                        ) : (
+                          <span style={{ color: '#94a3b8' }}>—</span>
+                        )}
+                      </td>
+                      <td>
+                        <select
+                          className="action-dropdown"
+                          value={student.status === 'Present' ? 'plan_b' : student.notifyParent ? 'standard' : 'plan_a'}
+                          onChange={(e) => handleAction(student.rollNo, e.target.value)}
+                        >
+                          <option value="plan_b">Plan B: Auto Present</option>
+                          <option value="plan_a">Plan A: Silent Absent</option>
+                          <option value="standard">Standard Absent (SMS)</option>
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {activeTab === 'timetable' && (
+            <div style={{ marginTop: '20px' }}>
+              <table className="data-table timetable-table">
+                <thead>
+                  <tr>
+                    <th>DAY</th>
+                    {periodTimes.map((time, idx) => (
+                      <th key={idx}>Period {idx + 1}<br/>({time})</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(timetable).map(day => (
+                    <tr key={day}>
+                      <td><strong>{day}</strong></td>
+                      {timetable[day].map((code, idx) => {
+                        const isSelected = selectedDay === day && selectedPeriodIndex === idx;
+                        const teacherInfo = getTeacherForCode(code);
+                        return (
+                          <td key={idx} className={isSelected ? 'active-slot' : ''}>
+                            <div className="slot-code">{code}</div>
+                            <div className="slot-teacher">{teacherInfo.teacher}</div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {activeTab === 'teachers' && (
+            <div className="grid-cards">
+              {teachers.map((item, idx) => (
+                <div className="faculty-card" key={idx}>
+                  <div className="faculty-name">{item.teacher}</div>
+                  <div className="faculty-subject">{item.subName}</div>
+                  <div className="faculty-phone">📞 Code: {item.subCode} | Mobile: {item.phone}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
