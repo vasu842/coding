@@ -184,8 +184,8 @@ function App() {
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
               >
                 <option value="1-1">B.Tech I Year I Sem (R23 Regular)</option>
-                <option value="2-1">B.Tech II Year I Sem (R20 Regular/Supply)</option>
-                <option value="2-2">B.Tech II Year II Sem (R20 Regular/Supply)</option>
+                <option value="2-1">B.Tech II Year I Sem (R23 Regular/Supply)</option>
+                <option value="2-2">B.Tech II Year II Sem (R23 Regular/Supply)</option>
               </select>
             </div>
 
