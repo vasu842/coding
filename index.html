@@ -1,70 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dynamic Student Report</title>
-    <style>
-        body { font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background: #eef2f5; }
-        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-        .PASSED { color: #28a745; font-weight: bold; }
-        .FAILED { color: #dc3545; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
-        th { background: #f8f9fa; }
-    </style>
-</head>
-<body>
-
-<div id="app"></div>
-
-<script>
-    // Paste your STUDENT_DATABASE object here
-    const STUDENT_DATABASE = {
-        "25G01A4301": {
-            rollNumber: "25G01A4301",
-            name: "A B SURESH",
-            branch: "Artificial Intelligence (AI)",
-            status: "FAILED",
-            sgpa: 4.03,
-            subjects: [
-                { code: "23HM0001", name: "COMMUNICATIVE ENGLISH", credits: 0, grade: "F", status: "FAIL" },
-                { code: "23BS0005", name: "CHEMISTRY", credits: 3, grade: "E", status: "PASS" }
-            ]
-        }
-        // ... add the rest of the database objects
-    };
-
-    const container = document.getElementById('app');
-
-    Object.values(STUDENT_DATABASE).forEach(student => {
-        let subjectsRows = student.subjects.map(s => `
-            <tr>
-                <td>${s.code}</td>
-                <td>${s.name}</td>
-                <td>${s.credits}</td>
-                <td>${s.grade}</td>
-                <td class="${s.status}">${s.status}</td>
-            </tr>
-        `).join('');
-
-        container.innerHTML += `
-            <div class="card">
-                <div class="header">
-                    <h3>${student.name} (${student.rollNumber})</h3>
-                    <span class="${student.status}">${student.status} - SGPA: ${student.sgpa}</span>
-                </div>
-                <p><strong>Branch:</strong> ${student.branch}</p>
-                <table>
-                    <thead>
-                        <tr><th>Subject Code</th><th>Subject Name</th><th>Credits</th><th>Grade</th><th>Status</th></tr>
-                    </thead>
-                    <tbody>${subjectsRows}</tbody>
-                </table>
-            </div>
-        `;
-    });
-</script>
-
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Results Portal</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

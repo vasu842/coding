@@ -1,34 +1,127 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
 body {
-    font-family: 'Inter', sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  padding: 20px;
 }
 
-/* Custom scrollbar for table container */
-.overflow-x-auto::-webkit-scrollbar {
-    height: 6px;
-}
-.overflow-x-auto::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
-    border-radius: 4px;
+.portal-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Print Optimization Styles */
-@media print {
-    body {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-    .print\:hidden {
-        display: none !important;
-    }
-    .print\:shadow-none {
-        box-shadow: none !important;
-    }
-    .print\:border-none {
-        border: none !important;
-    }
-    .print\:p-0 {
-        padding: 0 !important;
-    }
+.header {
+  text-align: center;
+  border-bottom: 2px solid #0056b3;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  color: #0056b3;
+}
+
+.header h2 {
+  font-size: 1.1rem;
+  color: #555;
+  margin-top: 5px;
+}
+
+.navigation-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.nav-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.search-select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 250px;
+}
+
+.student-info {
+  background-color: #eef2f5;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1rem));
+  gap: 10px;
+}
+
+.student-info p {
+  font-size: 0.95rem;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.results-table th,
+.results-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.results-table th {
+  background-color: #0056b3;
+  color: white;
+}
+
+.results-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.status-pass {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-fail {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.summary-card {
+  display: flex;
+  justify-content: space-between;
+  background: #f8f9fa;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-weight: bold;
 }
