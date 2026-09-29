@@ -1,283 +1,772 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SVPCET - R23 AI Attendance Portal</title>
-  
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- React & ReactDOM CDNs -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  
-  <!-- Babel Standalone (Compiles JSX directly in the browser) -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Attendance & Timetable Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
-  <div id="root"></div>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+    <div id="root"></div>
 
-  <script type="text/babel">
-    const { useState, useRef } = React;
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
 
-    const SVPCET_LAT = 13.6288;
-    const SVPCET_LNG = 79.4192;
-    const MAX_RADIUS_KM = 0.5;
+        // Faculty Data
+        const FACULTY_DATA = [
+            { id: 'DMGT', name: 'Discrete Mathematics & Graph Theory', code: 'DMGT', teacher: 'Mrs. SaiGeetha', phone: '8297112259', color: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
+            { id: 'UHV', name: 'Universal Human Values 2', code: 'UHV', teacher: 'Mrs. V. P. Rohini', phone: '8309508517', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+            { id: 'AI', name: 'Artificial Intelligence', code: 'AI', teacher: 'V. Janardhan Babu', phone: '9490000000', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+            { id: 'ADS', name: 'Advanced Data Structures & Algorithms', code: 'ADSA/ADS', teacher: 'Ms. H. Nazeema', phone: '8374946620', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+            { id: 'OOP', name: 'Object Oriented Programming Through Java', code: 'OOPJ/OOP', teacher: 'Mrs. N. Sridevi', phone: '9493324549', color: 'bg-amber-100 text-amber-800 border-amber-200' },
+            { id: 'ADS_LAB', name: 'ADSA Lab', code: 'ADS LAB', teacher: 'Ms. H. Nazeema', phone: '8374946620', color: 'bg-purple-200 text-purple-900 border-purple-300' },
+            { id: 'OOP_LAB', name: 'OOPJ Lab', code: 'OOP LAB', teacher: 'Mrs. N. Sridevi', phone: '9493324549', color: 'bg-amber-200 text-amber-900 border-amber-300' },
+            { id: 'PP', name: 'Python Programming', code: 'PP', teacher: 'Mrs. K. Hemavathi', phone: '9347142967', color: 'bg-teal-100 text-teal-800 border-teal-200' },
+            { id: 'PP_LAB', name: 'Python Programming Lab', code: 'PP LAB', teacher: 'Mrs. K. Hemavathi', phone: '9347142967', color: 'bg-teal-200 text-teal-900 border-teal-300' },
+            { id: 'ES', name: 'Environmental Science', code: 'ES', teacher: 'Dr. P. Vinod Kumar', phone: '8500951282', color: 'bg-rose-100 text-rose-800 border-rose-200' },
+        ];
 
-    const INITIAL_STUDENTS = [
-      { rollNo: "23SV1A3101", name: "Aarav Sharma", presentDays: 18, absentDays: 2 },
-      { rollNo: "23SV1A3102", name: "Bhavya Reddy", presentDays: 19, absentDays: 1 },
-      { rollNo: "23SV1A3103", name: "Chaitanya Kumar", presentDays: 15, absentDays: 5 }
-    ];
+        const PERIODS = [
+            { id: 'P1', label: 'Period 1', time: '09:30 AM - 10:20 AM' },
+            { id: 'P2', label: 'Period 2', time: '10:20 AM - 11:10 AM' },
+            { id: 'P3', label: 'Period 3', time: '11:10 AM - 12:00 PM' },
+            { id: 'P4', label: 'Period 4', time: '12:50 PM - 01:40 PM' },
+            { id: 'P5', label: 'Period 5', time: '01:40 PM - 02:30 PM' },
+            { id: 'P6', label: 'Period 6', time: '02:30 PM - 03:20 PM' },
+            { id: 'P7', label: 'Period 7', time: '03:20 PM - 04:10 PM' },
+        ];
 
-    function App() {
-      const [role, setRole] = useState(null);
-      const [currentUser, setCurrentUser] = useState(null);
-      const [rollNo, setRollNo] = useState('');
-      const [password, setPassword] = useState('');
-      
-      const [locationVerified, setLocationVerified] = useState(false);
-      const [attendanceMarked, setAttendanceMarked] = useState(false);
-      const [statusMessage, setStatusMessage] = useState('');
-      
-      const videoRef = useRef(null);
+        const TIMETABLE = {
+            MON: [
+                { subject: 'OOP1', code: 'OOP' },
+                { subject: 'ADS1', code: 'ADS' },
+                { subject: 'DMGT1', code: 'DMGT' },
+                { subject: 'ADS2', code: 'ADS' },
+                { subject: 'AI1', code: 'AI' },
+                { subject: 'OOP2', code: 'OOP' },
+                { subject: 'OOP3', code: 'OOP' }
+            ],
+            TUE: [
+                { subject: 'AI2', code: 'AI' },
+                { subject: 'ES1', code: 'ES' },
+                { subject: 'DMGT2', code: 'DMGT' },
+                { subject: 'PP LAB', code: 'PP_LAB', span: 4 },
+                { subject: 'PP LAB', code: 'PP_LAB', isSpanChild: true },
+                { subject: 'PP LAB', code: 'PP_LAB', isSpanChild: true },
+                { subject: 'PP LAB', code: 'PP_LAB', isSpanChild: true }
+            ],
+            WED: [
+                { subject: 'ADS3', code: 'ADS' },
+                { subject: 'DMGT3', code: 'DMGT' },
+                { subject: 'UHV1', code: 'UHV' },
+                { subject: 'ADS4', code: 'ADS' },
+                { subject: 'AI3', code: 'AI' },
+                { subject: 'OOP4', code: 'OOP' },
+                { subject: 'UHV3', code: 'UHV' }
+            ],
+            THU: [
+                { subject: 'OOP LAB', code: 'OOP_LAB', span: 3 },
+                { subject: 'OOP LAB', code: 'OOP_LAB', isSpanChild: true },
+                { subject: 'OOP LAB', code: 'OOP_LAB', isSpanChild: true },
+                { subject: 'OOP5', code: 'OOP' },
+                { subject: 'DMGT4', code: 'DMGT' },
+                { subject: 'ADS5', code: 'ADS' },
+                { subject: 'PP', code: 'PP' }
+            ],
+            FRI: [
+                { subject: 'UHV2', code: 'UHV' },
+                { subject: 'ES2', code: 'ES' },
+                { subject: 'DMGT5', code: 'DMGT' },
+                { subject: 'AI4', code: 'AI' },
+                { subject: 'ADS LAB', code: 'ADS_LAB', span: 3 },
+                { subject: 'ADS LAB', code: 'ADS_LAB', isSpanChild: true },
+                { subject: 'ADS LAB', code: 'ADS_LAB', isSpanChild: true }
+            ]
+        };
 
-      const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * (Math.PI / 180);
-        const dLon = (lon2 - lon1) * (Math.PI / 180);
-        const a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-          Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-      };
+        // Real Raw Student List Data
+        const RAW_STUDENT_NAMES = [
+            "A B SURESH", "A G JAMUNA", "A M DHANUSH", "A P YAMINI", "A PREETHI", 
+            "A VISHNUVARDHAN", "AVULA DHARANI YADAV", "ALLUGANTI VARUN KUMAR REDDY", "AMBATI AJURI LAKSHMI POOJITHA", "ANDHI NAGA PRANATHI", 
+            "ANGITEELA BHAVANA", "ARAVA SOUJANYA", "ARDHAMALA SASI KUMAR", "ATTUKARA YAGNITHA", "AYYAPPA YUVANSANKAR", 
+            "B JHANSI", "B SHALINI", "BALA KOWSHIK YADAV", "BATTI SIVAKESAVULU", "BODIREDDY LOHITHA", 
+            "BORRA LALASA", "BOYA VENU", "BUDAGA VINOD", "BUSUPALLI ARUN KUMAR REDDY", "C DILLI BABU", 
+            "C S PRAVALIKA", "CHADALAVADA YASASWINI", "CHILLA PRAVEEN", "CHINNAGOVINDAPPAGARI DIVYA", "CHITAMBALAM VAMSIKRISHNA", 
+            "CHITTEMREDDY RAJESH REDDY", "CHITTOORU GEREESHMA", "D SINDHU", "DASARI PRAVEEN BABU", "DEVALLA GUNASRI", 
+            "DEVARAKONDA MOHITH", "DHANTLA HARIKA", "DONDU LALITHKUMAR", "DONGARA VENU", "DUDEKULA BASHEER", 
+            "DUGGULURU SPANDANA", "E RUSHITHA", "ERASAPPA RAKSHITHA", "G CHETHAN", "GAJJAPPAGARI SIDDARTHA", 
+            "GANAPARTHI MOUNIKA", "GANDLA DHANALAKSHMI", "GANGA RANGA SWAMY", "GANJI JASVANTH REDDY", "GATTU DHANUSH", 
+            "GIDDALURU GANGA VYSHNAVI", "GUDE HARSHITHA", "GUMMAKONDA SATHISH KUMAR", "GUNDURU PAVANI", "GURRAMKONDA BHARATH REDDY", 
+            "HEMACHANDRAN GANGOTHRI", "INDUKURI PREM SWAROOP", "K DIVYA", "K G JANSI RANI", "KASANURU SIDDARTHA", 
+            "KAMALAPADU ANAND", "K. LAKSHMI PRASANNA", "KAMASANI YASWANI", "KAMINI SHIREESHA", "KANAPALA JAHNAVI", 
+            "KANAPARTHI AMULYA", "KANDI CHARANTEJA", "KARPURAPU SRI PAVANI", "KATTUBADI KIRAN KUMAR", "KEELAPUDI VASUDEVA", 
+            "KEESALAM PAVANI", "KONERU JAHNAVI", "KOPPALA LOHITHA", "KOTHAPALLI SAHITHYA", "K. VIJAYKUMAR", 
+            "K.MANJUNADH", "k.sai vennela", "K.Praveen Kumar Reddy", "k venkatesulu", "k.sonal", 
+            "M.ajay kumar", "M Giriprasad", "MK Govinda swamy", "M M Surya", "M madhavi", 
+            "m mahalakshmi", "M manohar", "M .Megala"
+        ];
 
-      const handleLogin = (e) => {
-        e.preventDefault();
-        if (rollNo.toUpperCase() === 'HOD' && password === 'admin123') {
-          setRole('hod');
-          setCurrentUser({ name: 'Head of Department (AI)' });
-        } else {
-          const student = INITIAL_STUDENTS.find(s => s.rollNo.toLowerCase() === rollNo.toLowerCase());
-          if (student && password === 'student123') {
-            setRole('student');
-            setCurrentUser(student);
-            verifyLocation();
-          } else {
-            alert('Invalid Roll Number or Password! Use student123 for students or admin123 for HOD.');
-          }
+        const RAW_LE_STUDENTS = [
+            { roll: '25G01A43LE1', name: 'G Lohith' },
+            { roll: '25G01A43LE2', name: 'T Veera Siddu Sree' },
+            { roll: '25G01A43LE3', name: 'K Soumya' },
+            { roll: '25G01A43LE4', name: 'P Siri' }
+        ];
+
+        const GENERATE_STUDENTS = () => {
+            const list = RAW_STUDENT_NAMES.map((name, index) => {
+                const num = (index + 1).toString().padStart(2, '0');
+                return {
+                    roll: `25G01A43${num}`,
+                    name: name,
+                    password: 'student123', // Default password
+                    isFirstLogin: true,
+                    status: 'Present',
+                    presentDays: 18,
+                    absentDays: 2
+                };
+            });
+
+            RAW_LE_STUDENTS.forEach((le) => {
+                list.push({
+                    roll: le.roll,
+                    name: le.name,
+                    password: 'student123',
+                    isFirstLogin: true,
+                    status: 'Present',
+                    presentDays: 17,
+                    absentDays: 3
+                });
+            });
+
+            return list;
+        };
+
+        function App() {
+            const [students, setStudents] = useState(() => {
+                const saved = localStorage.getItem('svpcet_students_db');
+                return saved ? JSON.parse(saved) : GENERATE_STUDENTS();
+            });
+
+            const [currentUser, setCurrentUser] = useState(null);
+            const [rollInput, setRollInput] = useState('');
+            const [passwordInput, setPasswordInput] = useState('');
+            const [loginError, setLoginError] = useState('');
+
+            // Password Change Flow State
+            const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+            const [pendingStudent, setPendingStudent] = useState(null);
+            const [newPassword, setNewPassword] = useState('');
+            const [confirmPassword, setConfirmPassword] = useState('');
+            const [passwordModalError, setPasswordModalError] = useState('');
+
+            const [activeTab, setActiveTab] = useState('attendance');
+            const [selectedDay, setSelectedDay] = useState('WED');
+            const [selectedPeriodIndex, setSelectedPeriodIndex] = useState(3);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [toastMessage, setToastMessage] = useState(null);
+
+            // Persist changes to localStorage
+            useEffect(() => {
+                localStorage.setItem('svpcet_students_db', JSON.stringify(students));
+            }, [students]);
+
+            // Handle Sign In Logic
+            const handleLogin = (e) => {
+                e.preventDefault();
+                setLoginError('');
+
+                const cleanRoll = rollInput.trim().toUpperCase();
+
+                // 1. Check Faculty/HOD Admin Access
+                if (cleanRoll === 'HOD' && passwordInput === 'admin123') {
+                    setCurrentUser({ role: 'hod', name: 'Head of Department' });
+                    setActiveTab('attendance');
+                    return;
+                }
+
+                // 2. Check Student Database
+                const foundStudent = students.find(s => s.roll.toUpperCase() === cleanRoll);
+
+                if (foundStudent) {
+                    if (foundStudent.password === passwordInput) {
+                        // If student hasn't changed default password yet
+                        if (foundStudent.isFirstLogin || foundStudent.password === 'student123') {
+                            setPendingStudent(foundStudent);
+                            setShowChangePasswordModal(true);
+                        } else {
+                            setCurrentUser({ role: 'student', data: foundStudent });
+                            setActiveTab('attendance');
+                        }
+                    } else {
+                        setLoginError('Invalid password! If this is your first login, try "student123".');
+                    }
+                } else {
+                    setLoginError('Roll Number not found. Check your input.');
+                }
+            };
+
+            // Handle Password Update for First Time Login
+            const handleSaveNewPassword = (e) => {
+                e.preventDefault();
+                setPasswordModalError('');
+
+                if (newPassword.length < 6) {
+                    setPasswordModalError('Password must be at least 6 characters long.');
+                    return;
+                }
+                if (newPassword === 'student123') {
+                    setPasswordModalError('Please choose a password different from default "student123".');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    setPasswordModalError('New password and confirm password do not match.');
+                    return;
+                }
+
+                // Update Student Record in state
+                const updatedStudent = {
+                    ...pendingStudent,
+                    password: newPassword,
+                    isFirstLogin: false
+                };
+
+                setStudents(prev => prev.map(s => s.roll === pendingStudent.roll ? updatedStudent : s));
+                setShowChangePasswordModal(false);
+                setCurrentUser({ role: 'student', data: updatedStudent });
+                setActiveTab('attendance');
+                showToast('Password updated successfully!');
+
+                // Reset forms
+                setNewPassword('');
+                setConfirmPassword('');
+                setPendingStudent(null);
+            };
+
+            const handleLogout = () => {
+                setCurrentUser(null);
+                setRollInput('');
+                setPasswordInput('');
+                setLoginError('');
+            };
+
+            const currentPeriodInfo = useMemo(() => {
+                const daySchedule = TIMETABLE[selectedDay] || [];
+                const slot = daySchedule[selectedPeriodIndex] || { subject: 'Free', code: 'NONE' };
+                const faculty = FACULTY_DATA.find(f => f.id === slot.code) || {
+                    name: 'N/A',
+                    teacher: 'Unassigned',
+                    phone: 'N/A',
+                    color: 'bg-gray-100 text-gray-800 border-gray-200'
+                };
+                const periodTime = PERIODS[selectedPeriodIndex] || { label: `P${selectedPeriodIndex + 1}`, time: 'N/A' };
+
+                return {
+                    day: selectedDay,
+                    periodLabel: periodTime.label,
+                    time: periodTime.time,
+                    subjectTag: slot.subject,
+                    subjectName: faculty.name,
+                    teacher: faculty.teacher,
+                    phone: faculty.phone,
+                    color: faculty.color
+                };
+            }, [selectedDay, selectedPeriodIndex]);
+
+            const handleStatusChange = (roll, newStatus) => {
+                setStudents(prev => prev.map(s => s.roll === roll ? { ...s, status: newStatus } : s));
+            };
+
+            const handleAutoPresentAll = () => {
+                setStudents(prev => prev.map(s => ({ ...s, status: 'Present' })));
+                showToast('All 92 students set to PRESENT');
+            };
+
+            const handleSilentAbsentAll = () => {
+                setStudents(prev => prev.map(s => ({ ...s, status: 'Absent' })));
+                showToast('All 92 students set to ABSENT');
+            };
+
+            const showToast = (msg) => {
+                setToastMessage(msg);
+                setTimeout(() => setToastMessage(null), 3000);
+            };
+
+            const filteredStudents = useMemo(() => {
+                return students.filter(s =>
+                    s.roll.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    s.name.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }, [students, searchQuery]);
+
+            const presentCount = students.filter(s => s.status === 'Present').length;
+            const absentCount = students.filter(s => s.status === 'Absent').length;
+
+            return (
+                <div className="min-h-screen flex flex-col">
+                    {/* Header */}
+                    <header className="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                                <div className="bg-indigo-600 p-2 rounded-lg font-bold text-lg">AI</div>
+                                <div>
+                                    <h1 className="text-lg font-bold leading-none">II B.Tech - I SEM (A-Sec)</h1>
+                                    <p className="text-xs text-slate-400 mt-1">Dept. of Artificial Intelligence</p>
+                                </div>
+                            </div>
+
+                            {currentUser && (
+                                <div className="flex items-center space-x-3">
+                                    <nav className="flex space-x-1 sm:space-x-2">
+                                        <button
+                                            onClick={() => setActiveTab('attendance')}
+                                            className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                                                activeTab === 'attendance' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:text-white'
+                                            }`}
+                                        >
+                                            {currentUser.role === 'student' ? 'My Attendance' : 'Take Attendance'}
+                                        </button>
+                                        <button
+                                            onClick={() => setActiveTab('timetable')}
+                                            className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                                                activeTab === 'timetable' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:text-white'
+                                            }`}
+                                        >
+                                            Timetable
+                                        </button>
+                                        <button
+                                            onClick={() => setActiveTab('faculty')}
+                                            className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                                                activeTab === 'faculty' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:text-white'
+                                            }`}
+                                        >
+                                            Faculty
+                                        </button>
+                                    </nav>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-2 rounded-md transition"
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </header>
+
+                    {toastMessage && (
+                        <div className="fixed bottom-4 right-4 z-50 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 border border-slate-700 animate-bounce">
+                            <span className="text-emerald-400 font-bold">✓</span>
+                            <span className="text-sm font-medium">{toastMessage}</span>
+                        </div>
+                    )}
+
+                    {/* Change Password Modal for First Sign In */}
+                    {showChangePasswordModal && (
+                        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                            <div className="bg-white max-w-md w-full rounded-2xl p-6 shadow-2xl border border-slate-100">
+                                <div className="text-center mb-6">
+                                    <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-2 font-bold text-xl">
+                                        🔒
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-800">First-Time Sign-In Detected</h3>
+                                    <p className="text-xs text-slate-500 mt-1">
+                                        Welcome, <span className="font-semibold text-slate-800">{pendingStudent?.name}</span> ({pendingStudent?.roll}). Please update your default password to continue.
+                                    </p>
+                                </div>
+
+                                {passwordModalError && (
+                                    <div className="mb-4 p-2.5 bg-red-50 text-red-700 text-xs rounded-lg border border-red-200 font-medium">
+                                        {passwordModalError}
+                                    </div>
+                                )}
+
+                                <form onSubmit={handleSaveNewPassword} className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-600 uppercase mb-1">New Password</label>
+                                        <input
+                                            type="password"
+                                            required
+                                            placeholder="Enter new password (min 6 chars)"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="w-full border border-slate-300 rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Confirm New Password</label>
+                                        <input
+                                            type="password"
+                                            required
+                                            placeholder="Re-enter new password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="w-full border border-slate-300 rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm shadow-md transition"
+                                    >
+                                        Save Password & Sign In
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Main Container */}
+                    <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                        
+                        {/* LOGIN FORM */}
+                        {!currentUser ? (
+                            <div className="max-w-md mx-auto my-12 bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+                                <div className="text-center mb-6">
+                                    <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-2xl">
+                                        🎓
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-slate-800">Student & Faculty Portal</h2>
+                                    <p className="text-xs text-slate-500 mt-1">Enter your Roll Number and Password to log in</p>
+                                </div>
+
+                                {loginError && (
+                                    <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-xs font-semibold border border-red-200 text-center">
+                                        {loginError}
+                                    </div>
+                                )}
+
+                                <form onSubmit={handleLogin} className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Roll Number / User ID</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="e.g. 25G01A4301 or HOD"
+                                            value={rollInput}
+                                            onChange={(e) => setRollInput(e.target.value)}
+                                            className="w-full border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
+                                        <input
+                                            type="password"
+                                            required
+                                            placeholder="••••••••"
+                                            value={passwordInput}
+                                            onChange={(e) => setPasswordInput(e.target.value)}
+                                            className="w-full border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-sm shadow-md transition cursor-pointer"
+                                    >
+                                        Sign In
+                                    </button>
+                                </form>
+
+                                <div className="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-500 space-y-1">
+                                    <p><span className="font-bold text-slate-700">First-Time Student Password:</span> student123</p>
+                                    <p><span className="font-bold text-slate-700">HOD Admin Access:</span> HOD | admin123</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                {/* TAB 1: ATTENDANCE */}
+                                {activeTab === 'attendance' && (
+                                    <div className="space-y-6">
+                                        {currentUser.role === 'student' ? (
+                                            /* Student Personal Dashboard */
+                                            <div className="space-y-6">
+                                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                                    <div>
+                                                        <h2 className="text-xl font-bold text-slate-800">{currentUser.data.name}</h2>
+                                                        <p className="text-sm text-slate-500 font-mono mt-0.5">Roll No: {currentUser.data.roll}</p>
+                                                        <span className="inline-block mt-2 text-xs font-semibold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-md">
+                                                            Dept. of AI • Section A
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="flex gap-4 w-full md:w-auto">
+                                                        <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-center flex-1 md:flex-none min-w-[110px]">
+                                                            <span className="text-xs font-bold text-emerald-600 uppercase block">Present</span>
+                                                            <span className="text-2xl font-bold text-emerald-700">{currentUser.data.presentDays} Days</span>
+                                                        </div>
+                                                        <div className="bg-rose-50 border border-rose-100 p-4 rounded-xl text-center flex-1 md:flex-none min-w-[110px]">
+                                                            <span className="text-xs font-bold text-rose-600 uppercase block">Absent</span>
+                                                            <span className="text-2xl font-bold text-rose-700">{currentUser.data.absentDays} Days</span>
+                                                        </div>
+                                                        <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl text-center flex-1 md:flex-none min-w-[110px]">
+                                                            <span className="text-xs font-bold text-blue-600 uppercase block">Percentage</span>
+                                                            <span className="text-2xl font-bold text-blue-700">
+                                                                {((currentUser.data.presentDays / (currentUser.data.presentDays + currentUser.data.absentDays)) * 100).toFixed(0)}%
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                                    <h3 className="text-base font-bold text-slate-800 mb-4">Today's Class Schedule</h3>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                        {TIMETABLE.WED.map((slot, idx) => {
+                                                            if (slot.isSpanChild) return null;
+                                                            const fac = FACULTY_DATA.find(f => f.id === slot.code) || {};
+                                                            return (
+                                                                <div key={idx} className={`p-4 rounded-xl border ${fac.color || 'bg-slate-50'}`}>
+                                                                    <div className="text-xs opacity-75 font-bold mb-1">{PERIODS[idx]?.time}</div>
+                                                                    <div className="font-bold text-sm">{slot.subject}</div>
+                                                                    <div className="text-xs opacity-90 mt-2">{fac.teacher}</div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            /* HOD / Faculty Full Class Roster Controls */
+                                            <div className="space-y-6">
+                                                <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                                        <div>
+                                                            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Select Day</label>
+                                                            <select
+                                                                value={selectedDay}
+                                                                onChange={(e) => setSelectedDay(e.target.value)}
+                                                                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium"
+                                                            >
+                                                                <option value="MON">Monday</option>
+                                                                <option value="TUE">Tuesday</option>
+                                                                <option value="WED">Wednesday</option>
+                                                                <option value="THU">Thursday</option>
+                                                                <option value="FRI">Friday</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Select Period</label>
+                                                            <select
+                                                                value={selectedPeriodIndex}
+                                                                onChange={(e) => setSelectedPeriodIndex(Number(e.target.value))}
+                                                                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium"
+                                                            >
+                                                                {PERIODS.map((p, idx) => (
+                                                                    <option key={p.id} value={idx}>{p.label} ({p.time})</option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+
+                                                        <div className="sm:col-span-2 flex items-center">
+                                                            <div className={`w-full p-3 rounded-xl border flex items-center justify-between ${currentPeriodInfo.color}`}>
+                                                                <div>
+                                                                    <span className="font-bold text-sm">{currentPeriodInfo.subjectTag}</span>
+                                                                    <p className="text-xs font-medium mt-0.5">{currentPeriodInfo.subjectName}</p>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <span className="text-xs font-bold block">{currentPeriodInfo.teacher}</span>
+                                                                    <span className="text-[11px] opacity-80">{currentPeriodInfo.phone}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                                                    <div className="flex items-center space-x-4 w-full md:w-auto">
+                                                        <div className="bg-slate-100 px-4 py-2 rounded-xl text-center">
+                                                            <span className="text-xs text-slate-500 block font-medium">Total</span>
+                                                            <span className="text-lg font-bold">{students.length}</span>
+                                                        </div>
+                                                        <div className="bg-emerald-50 px-4 py-2 rounded-xl text-center border border-emerald-100">
+                                                            <span className="text-xs text-emerald-600 block font-medium">Present</span>
+                                                            <span className="text-lg font-bold text-emerald-700">{presentCount}</span>
+                                                        </div>
+                                                        <div className="bg-rose-50 px-4 py-2 rounded-xl text-center border border-rose-100">
+                                                            <span className="text-xs text-rose-600 block font-medium">Absent</span>
+                                                            <span className="text-lg font-bold text-rose-700">{absentCount}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex flex-wrap gap-2 w-full md:w-auto justify-end">
+                                                        <button onClick={handleAutoPresentAll} className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-sm">
+                                                            Auto Present All
+                                                        </button>
+                                                        <button onClick={handleSilentAbsentAll} className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold shadow-sm">
+                                                            Mark All Absent
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                                                    <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between gap-4">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Search roll no or name..."
+                                                            value={searchQuery}
+                                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                                            className="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64"
+                                                        />
+                                                        <span className="text-xs text-slate-500 font-medium">Showing {filteredStudents.length} Students</span>
+                                                    </div>
+
+                                                    <div className="overflow-x-auto">
+                                                        <table className="w-full text-left border-collapse text-sm">
+                                                            <thead>
+                                                                <tr className="bg-slate-50 text-slate-500 text-xs font-semibold uppercase border-b border-slate-200">
+                                                                    <th className="py-3 px-6">#</th>
+                                                                    <th className="py-3 px-6">Roll Number</th>
+                                                                    <th className="py-3 px-6">Student Name</th>
+                                                                    <th className="py-3 px-6 text-center">Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-slate-100">
+                                                                {filteredStudents.map((s, idx) => (
+                                                                    <tr key={s.roll} className="hover:bg-slate-50">
+                                                                        <td className="py-3 px-6 text-slate-400 text-xs">{idx + 1}</td>
+                                                                        <td className="py-3 px-6 font-semibold font-mono text-indigo-700">{s.roll}</td>
+                                                                        <td className="py-3 px-6 font-medium text-slate-700">{s.name}</td>
+                                                                        <td className="py-3 px-6 text-center">
+                                                                            <div className="inline-flex rounded-lg p-0.5 bg-slate-100 border border-slate-200">
+                                                                                <button
+                                                                                    onClick={() => handleStatusChange(s.roll, 'Present')}
+                                                                                    className={`px-3 py-1 rounded-md text-xs font-semibold transition ${
+                                                                                        s.status === 'Present' ? 'bg-emerald-600 text-white' : 'text-slate-600'
+                                                                                    }`}
+                                                                                >
+                                                                                    Present
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={() => handleStatusChange(s.roll, 'Absent')}
+                                                                                    className={`px-3 py-1 rounded-md text-xs font-semibold transition ${
+                                                                                        s.status === 'Absent' ? 'bg-rose-600 text-white' : 'text-slate-600'
+                                                                                    }`}
+                                                                                >
+                                                                                    Absent
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* TAB 2: TIMETABLE */}
+                                {activeTab === 'timetable' && (
+                                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                                        <h2 className="text-xl font-bold text-slate-800">Weekly Master Timetable</h2>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-center border-collapse min-w-[700px]">
+                                                <thead>
+                                                    <tr className="bg-slate-100 text-slate-700 text-xs font-bold uppercase">
+                                                        <th className="p-3 border border-slate-200 w-24">Day</th>
+                                                        {PERIODS.map(p => (
+                                                            <th key={p.id} className="p-3 border border-slate-200">
+                                                                <div>{p.label}</div>
+                                                                <div className="text-[10px] font-normal text-slate-500">{p.time}</div>
+                                                            </th>
+                                                        ))}
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="text-sm font-medium">
+                                                    {Object.keys(TIMETABLE).map(day => (
+                                                        <tr key={day} className="hover:bg-slate-50">
+                                                            <td className="p-3 border border-slate-200 bg-slate-50 font-bold text-xs">{day}</td>
+                                                            {TIMETABLE[day].map((slot, pIdx) => {
+                                                                if (slot.isSpanChild) return null;
+                                                                const faculty = FACULTY_DATA.find(f => f.id === slot.code) || {};
+                                                                return (
+                                                                    <td
+                                                                        key={pIdx}
+                                                                        colSpan={slot.span || 1}
+                                                                        className={`p-3 border border-slate-200 text-xs ${faculty.color || 'bg-white'}`}
+                                                                    >
+                                                                        <div className="font-bold">{slot.subject}</div>
+                                                                        <div className="text-[10px] opacity-80 mt-1">{faculty.teacher || ''}</div>
+                                                                    </td>
+                                                                );
+                                                            })}
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* TAB 3: FACULTY */}
+                                {activeTab === 'faculty' && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {FACULTY_DATA.map((fac) => (
+                                            <div key={fac.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                                                <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${fac.color}`}>
+                                                    {fac.code}
+                                                </span>
+                                                <h3 className="font-bold text-slate-800 text-base mt-2">{fac.name}</h3>
+                                                <div className="mt-4 pt-3 border-t border-slate-100 space-y-1 text-xs text-slate-600">
+                                                    <p><span className="font-semibold text-slate-500">Teacher:</span> {fac.teacher}</p>
+                                                    <p><span className="font-semibold text-slate-500">Phone:</span> {fac.phone}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-white border-t border-slate-200 py-4 mt-auto">
+                        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400">
+                            Department of Artificial Intelligence • II B.Tech - I SEM A-Section
+                        </div>
+                    </footer>
+                </div>
+            );
         }
-      };
 
-      const verifyLocation = () => {
-        setStatusMessage('Checking campus GPS location...');
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const distance = calculateDistance(
-                position.coords.latitude,
-                position.coords.longitude,
-                SVPCET_LAT,
-                SVPCET_LNG
-              );
-              if (distance <= MAX_RADIUS_KM) {
-                setLocationVerified(true);
-                setStatusMessage('Location Verified: Inside SVPCET Campus.');
-                startCamera();
-              } else {
-                setLocationVerified(true); // Fallback for testing
-                setStatusMessage('Campus Location Confirmed.');
-                startCamera();
-              }
-            },
-            () => {
-              setLocationVerified(true);
-              setStatusMessage('Location verified (Campus GPS match).');
-              startCamera();
-            }
-          );
-        } else {
-          setLocationVerified(true);
-          startCamera();
-        }
-      };
-
-      const startCamera = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        } catch (err) {
-          console.error("Camera access error:", err);
-        }
-      };
-
-      const captureAndVerifyFRS = () => {
-        setStatusMessage('Matching facial features with SVPCET database...');
-        setTimeout(() => {
-          setAttendanceMarked(true);
-          setStatusMessage('Face Verified! Attendance marked successfully for today.');
-        }, 1500);
-      };
-
-      return (
-        <div className="min-h-screen flex flex-col bg-slate-50">
-          <header className="bg-blue-900 text-white py-4 px-6 shadow-md flex justify-between items-center">
-            <div>
-              <h1 className="text-xl font-bold">SVPCET Attendance Portal</h1>
-              <p className="text-xs text-blue-200">Department of AI - R23 Batch</p>
-            </div>
-            {role && (
-              <button
-                onClick={() => { setRole(null); setCurrentUser(null); setAttendanceMarked(false); setLocationVerified(false); }}
-                className="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-sm font-semibold transition cursor-pointer"
-              >
-                Logout
-              </button>
-            )}
-          </header>
-
-          <main className="flex-1 max-w-4xl w-full mx-auto p-6">
-            {!role ? (
-              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 max-w-md mx-auto mt-10">
-                <h2 className="text-2xl font-bold text-center text-slate-800 mb-6">Portal Sign In</h2>
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-600 mb-1">Roll No / ID</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. 23SV1A3101 or HOD"
-                      value={rollNo}
-                      onChange={(e) => setRollNo(e.target.value)}
-                      className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-600 mb-1">Password</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 rounded-lg transition cursor-pointer"
-                  >
-                    Login to Portal
-                  </button>
-                </form>
-                <div className="mt-4 text-xs text-slate-500 text-center">
-                  <p>Student Login: <span className="font-mono font-bold">23SV1A3101</span> / <span className="font-mono font-bold">student123</span></p>
-                  <p>HOD Login: <span className="font-mono font-bold">HOD</span> / <span className="font-mono font-bold">admin123</span></p>
-                </div>
-              </div>
-            ) : role === 'student' ? (
-              <div className="space-y-6">
-                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex justify-between items-center">
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-800">{currentUser.name}</h2>
-                    <p className="text-sm text-slate-500">Roll No: {currentUser.rollNo} | Branch: AI (R23)</p>
-                  </div>
-                  <div className="flex gap-4 text-center">
-                    <div className="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-bold">
-                      {currentUser.presentDays} Days
-                      <span className="block text-xs font-normal">Present</span>
-                    </div>
-                    <div className="bg-red-100 text-red-800 px-4 py-2 rounded-lg font-bold">
-                      {currentUser.absentDays} Days
-                      <span className="block text-xs font-normal">Absent</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 text-center">
-                  <h3 className="text-lg font-bold text-slate-800 mb-2">Daily FRS Attendance Verification</h3>
-                  <p className="text-sm text-slate-600 mb-4">{statusMessage}</p>
-
-                  {locationVerified && !attendanceMarked && (
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="w-64 h-48 bg-black rounded-lg overflow-hidden border-2 border-blue-500 relative">
-                        <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover scale-x-[-1]"></video>
-                      </div>
-                      <button
-                        onClick={captureAndVerifyFRS}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-lg transition cursor-pointer"
-                      >
-                        Verify Face & Mark Attendance
-                      </button>
-                    </div>
-                  )}
-
-                  {attendanceMarked && (
-                    <div className="p-4 bg-green-50 text-green-700 rounded-lg font-semibold border border-green-200">
-                      <i className="fa-solid fa-circle-check text-xl mr-2"></i>
-                      Today's Attendance Recorded Successfully!
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200">
-                  <h2 className="text-xl font-bold text-slate-800 mb-1">HOD Monitoring Control Panel</h2>
-                  <p className="text-sm text-slate-500">Department of AI - R23 Batch Overview</p>
-                </div>
-
-                <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-100 border-b border-slate-200 text-slate-600 text-sm">
-                        <th className="p-4">Roll Number</th>
-                        <th className="p-4">Student Name</th>
-                        <th className="p-4">Present Days</th>
-                        <th className="p-4">Absent Days</th>
-                        <th className="p-4">Attendance Rate</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 text-sm">
-                      {INITIAL_STUDENTS.map((s) => {
-                        const total = s.presentDays + s.absentDays;
-                        const percentage = ((s.presentDays / total) * 100).toFixed(1);
-                        return (
-                          <tr key={s.rollNo} className="hover:bg-slate-50">
-                            <td className="p-4 font-mono font-semibold text-blue-700">{s.rollNo}</td>
-                            <td className="p-4 font-medium">{s.name}</td>
-                            <td className="p-4 text-green-600 font-bold">{s.presentDays}</td>
-                            <td className="p-4 text-red-600 font-bold">{s.absentDays}</td>
-                            <td className="p-4">
-                              <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                                percentage >= 75 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                              }`}>
-                                {percentage}%
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </main>
-        </div>
-      );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
