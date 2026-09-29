@@ -29,9 +29,98 @@
     const MAX_RADIUS_KM = 0.5;
 
     const INITIAL_STUDENTS = [
-      { rollNo: "23SV1A3101", name: "Aarav Sharma", presentDays: 18, absentDays: 2 },
-      { rollNo: "23SV1A3102", name: "Bhavya Reddy", presentDays: 19, absentDays: 1 },
-      { rollNo: "23SV1A3103", name: "Chaitanya Kumar", presentDays: 15, absentDays: 5 }
+      { rollNo: "25G01A4301", name: "A B SURESH", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4302", name: "A G JAMUNA", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4303", name: "A M DHANUSH", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4304", name: "A P YAMINI", presentDays: 20, absentDays: 0 },
+      { rollNo: "25G01A4305", name: "A PREETHI", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4306", name: "A VISHNUVARDHAN", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4307", name: "AAVULA DHARANI YADAV", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4308", name: "ALLUGANTI VARUN KUMAR REDDY", presentDays: 15, absentDays: 5 },
+      { rollNo: "25G01A4309", name: "AMBATI AJURI LAKSHMI POOJITHA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4310", name: "ANDHI NAGA PRANATHI", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4311", name: "ANGITEELA BHAVANA", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4312", name: "ARAVA SOUJANYA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4313", name: "ARDHAMALA SASI KUMAR", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4314", name: "ATTUKARA YAGNITHA", presentDays: 20, absentDays: 0 },
+      { rollNo: "25G01A4315", name: "AYYAPPA YUVANSANKAR", presentDays: 15, absentDays: 5 },
+      { rollNo: "25G01A4316", name: "B JHANSI", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4317", name: "B SHALINI", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4318", name: "BALA KOWSHIK YADAV", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4319", name: "BATTI SIVAKESAVULU", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4320", name: "BODIREDDY LOHITHA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4321", name: "BORRA LALASA", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4322", name: "BOYA VENU", presentDays: 14, absentDays: 6 },
+      { rollNo: "25G01A4323", name: "BUDAGA VINOD", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4324", name: "BUSUPALLI ARUN KUMAR REDDY", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4325", name: "C DILLI BABU", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4326", name: "C S PRAVALIKA", presentDays: 20, absentDays: 0 },
+      { rollNo: "25G01A4327", name: "CHADALAVADA YASASWINI", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4328", name: "CHILLA PRAVEEN", presentDays: 15, absentDays: 5 },
+      { rollNo: "25G01A4329", name: "CHINNAGOVINDAPPAGARI DIVYA", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4330", name: "CHITAMBALAM VAMSIKRISHNA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4331", name: "CHITTEMREDDY RAJESH REDDY", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4332", name: "CHITTOORU GEREESHMA", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4333", name: "D SINDHU", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4334", name: "DASARI PRAVEEN BABU", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4335", name: "DEVALLA GUNASRI", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4336", name: "DEVARAKONDA MOHITH", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4337", name: "DHANTLA HARIKA", presentDays: 20, absentDays: 0 },
+      { rollNo: "25G01A4338", name: "DONDU LALITHKUMAR", presentDays: 15, absentDays: 5 },
+      { rollNo: "25G01A4339", name: "DONGARA VENU", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4340", name: "DUDEKULA BASHEER", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4341", name: "DUGGULURU SPANDANA", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4342", name: "E RUSHITHA", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4343", name: "ERASAPPA RAKSHITHA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4344", name: "G CHETHAN", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4345", name: "GAJJAPPAGARI SIDDARTHA", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4346", name: "GANAPARTHI MOUNIKA", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4347", name: "GANDLA DHANALAKSHMI", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4348", name: "GANGA RANGA SWAMY", presentDays: 15, absentDays: 5 },
+      { rollNo: "25G01A4349", name: "GANJI JASVANTH REDDY", presentDays: 20, absentDays: 0 },
+      { rollNo: "25G01A4350", name: "GATTU DHANUSH", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4351", name: "GIDDALURU GANGA VYSHNAVI", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4352", name: "GUDE HARSHITHA", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4353", name: "GUMMAKONDA SATHISH KUMAR", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4354", name: "GUNDURU PAVANI", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4355", name: "GURRAMKONDA BHARATH REDDY", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4356", name: "HEMACHANDRAN GANGOTHRI", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4357", name: "INDUKURI PREM SWAROOP", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4358", name: "K DIVYA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4359", name: "K G JANSI RANI", presentDays: 20, absentDays: 0 },
+      { rollNo: "25G01A4360", name: "KASANURU SIDDARTHA", presentDays: 15, absentDays: 5 },
+      { rollNo: "25G01A4361", name: "KAMALAPADU ANAND", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4362", name: "K. LAKSHMI PRASANNA", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4363", name: "KAMASANI YASWANI", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4364", name: "KAMINI SHIREESHA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4365", name: "KANAPALA JAHNAVI", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4366", name: "KANAPARTHI AMULYA", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4367", name: "KANDI CHARANTEJA", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4368", name: "KARPURAPU SRI PAVANI", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4369", name: "KATTUBADI KIRAN KUMAR", presentDays: 15, absentDays: 5 },
+      { rollNo: "25G01A4370", name: "KEELAPUDI VASUDEVA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4371", name: "KEESALAM PAVANI", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4372", name: "KONERU JAHNAVI", presentDays: 20, absentDays: 0 },
+      { rollNo: "25G01A4373", name: "KOPPALA LOHITHA", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4374", name: "KOTHAPALLI SAHITHYA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4375", name: "K. VIJAYKUMAR", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4376", name: "K. MANJUNADH", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4377", name: "K. SAI VENNELA", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4378", name: "K. PRAVEEN KUMAR REDDY", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4379", name: "K. VENKATESULU", presentDays: 15, absentDays: 5 },
+      { rollNo: "25G01A4380", name: "K. SONAL", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4381", name: "M. AJAY KUMAR", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4382", name: "M. GIRIPRASAD", presentDays: 19, absentDays: 1 },
+      { rollNo: "25G01A4383", name: "M. K. GOVINDA SWAMY", presentDays: 16, absentDays: 4 },
+      { rollNo: "25G01A4384", name: "M. M. SURYA", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4385", name: "M. MADHAVI", presentDays: 20, absentDays: 0 },
+      { rollNo: "25G01A4386", name: "M. MAHALAKSHMI", presentDays: 17, absentDays: 3 },
+      { rollNo: "25G01A4387", name: "M. MANOHAR", presentDays: 18, absentDays: 2 },
+      { rollNo: "25G01A4388", name: "M. MEGALA", presentDays: 19, absentDays: 1 },
+      { rollNo: "LE1", name: "G. LOHITH", presentDays: 15, absentDays: 2 },
+      { rollNo: "LE2", name: "T. VEERA SIDDU SREE", presentDays: 16, absentDays: 1 },
+      { rollNo: "LE3", name: "K. SOUMYA (28/8)", presentDays: 14, absentDays: 3 },
+      { rollNo: "LE4", name: "P. SIRI (28/8)", presentDays: 15, absentDays: 2 }
     ];
 
     function App() {
@@ -64,7 +153,7 @@
           setRole('hod');
           setCurrentUser({ name: 'Head of Department (AI)' });
         } else {
-          const student = INITIAL_STUDENTS.find(s => s.rollNo.toLowerCase() === rollNo.toLowerCase());
+          const student = INITIAL_STUDENTS.find(s => s.rollNo.toLowerCase() === rollNo.trim().toLowerCase());
           if (student && password === 'student123') {
             setRole('student');
             setCurrentUser(student);
@@ -154,7 +243,7 @@
                     <input
                       type="text"
                       required
-                      placeholder="e.g. 23SV1A3101 or HOD"
+                      placeholder="e.g. 25G01A4301 or HOD"
                       value={rollNo}
                       onChange={(e) => setRollNo(e.target.value)}
                       className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -178,8 +267,8 @@
                     Login to Portal
                   </button>
                 </form>
-                <div className="mt-4 text-xs text-slate-500 text-center">
-                  <p>Student Login: <span className="font-mono font-bold">23SV1A3101</span> / <span className="font-mono font-bold">student123</span></p>
+                <div className="mt-4 text-xs text-slate-500 text-center space-y-1">
+                  <p>Student Login: <span className="font-mono font-bold">Your Roll No</span> / <span className="font-mono font-bold">student123</span></p>
                   <p>HOD Login: <span className="font-mono font-bold">HOD</span> / <span className="font-mono font-bold">admin123</span></p>
                 </div>
               </div>
@@ -232,42 +321,44 @@
               <div className="space-y-6">
                 <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200">
                   <h2 className="text-xl font-bold text-slate-800 mb-1">HOD Monitoring Control Panel</h2>
-                  <p className="text-sm text-slate-500">Department of AI - R23 Batch Overview</p>
+                  <p className="text-sm text-slate-500">Department of AI - R23 Batch Overview ({INITIAL_STUDENTS.length} Students)</p>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-100 border-b border-slate-200 text-slate-600 text-sm">
-                        <th className="p-4">Roll Number</th>
-                        <th className="p-4">Student Name</th>
-                        <th className="p-4">Present Days</th>
-                        <th className="p-4">Absent Days</th>
-                        <th className="p-4">Attendance Rate</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 text-sm">
-                      {INITIAL_STUDENTS.map((s) => {
-                        const total = s.presentDays + s.absentDays;
-                        const percentage = ((s.presentDays / total) * 100).toFixed(1);
-                        return (
-                          <tr key={s.rollNo} className="hover:bg-slate-50">
-                            <td className="p-4 font-mono font-semibold text-blue-700">{s.rollNo}</td>
-                            <td className="p-4 font-medium">{s.name}</td>
-                            <td className="p-4 text-green-600 font-bold">{s.presentDays}</td>
-                            <td className="p-4 text-red-600 font-bold">{s.absentDays}</td>
-                            <td className="p-4">
-                              <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                                percentage >= 75 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                              }`}>
-                                {percentage}%
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                  <div className="max-h-[600px] overflow-y-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead className="sticky top-0 bg-slate-100 border-b border-slate-200 text-slate-600 text-sm shadow-sm">
+                        <tr>
+                          <th className="p-4">Roll Number</th>
+                          <th className="p-4">Student Name</th>
+                          <th className="p-4">Present Days</th>
+                          <th className="p-4">Absent Days</th>
+                          <th className="p-4">Attendance Rate</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-sm">
+                        {INITIAL_STUDENTS.map((s) => {
+                          const total = s.presentDays + s.absentDays;
+                          const percentage = ((s.presentDays / total) * 100).toFixed(1);
+                          return (
+                            <tr key={s.rollNo} className="hover:bg-slate-50">
+                              <td className="p-4 font-mono font-semibold text-blue-700">{s.rollNo}</td>
+                              <td className="p-4 font-medium">{s.name}</td>
+                              <td className="p-4 text-green-600 font-bold">{s.presentDays}</td>
+                              <td className="p-4 text-red-600 font-bold">{s.absentDays}</td>
+                              <td className="p-4">
+                                <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                                  percentage >= 75 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {percentage}%
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             )}
