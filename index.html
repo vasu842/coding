@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChatGPT Project Generator</title>
-  
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>AI ProjectGPT Generator</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,194 +12,124 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   
-  <!-- Babel Standalone for JSX rendering -->
+  <!-- Babel Standalone (Compiles JSX directly in the browser) -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 3px;
-    }
-  </style>
 </head>
-<body class="bg-white text-gray-800 antialiased min-h-screen flex">
-  <div id="root" class="w-full"></div>
+<body class="bg-slate-900 text-white min-h-screen">
+  <div id="root"></div>
 
+  <!-- Inline React Component (Runs Everywhere without Node/Vite) -->
   <script type="text/babel">
     const { useState } = React;
 
     function App() {
-      const [projectType, setProjectType] = useState('E-Commerce Application');
-      const [prompt, setPrompt] = useState('');
+      const [projectType, setProjectType] = useState('E-Commerce Web Application');
+      const [title, setTitle] = useState('');
+      const [description, setDescription] = useState('');
       const [output, setOutput] = useState(null);
       const [activeTab, setActiveTab] = useState('rootPlan');
 
       const projectOptions = [
-        'E-Commerce Application',
-        'AI Chatbot Application',
+        'E-Commerce Web Application',
         'SaaS Analytics Dashboard',
-        'Social Media Platform',
-        'Blogging & CMS Engine',
-        'REST API Backend Service'
+        'Social Media App',
+        'AI Chatbot Application',
+        'Blogging & CMS Platform',
+        'REST API Backend Microservice'
       ];
 
       const handleGenerate = (e) => {
         e.preventDefault();
-        if (!prompt.trim()) return;
-
-        const cleanTitle = prompt.split(' ')[0] || 'ProjectGPT';
+        
+        const cleanTitle = title || 'MyProject';
         const dbName = cleanTitle.toLowerCase().replace(/[^a-z0-9]/g, '_');
 
         setOutput({
-          rootPlan: `1. Define system core requirements for ${prompt}.\n2. Configure routes and components for ${projectType}.\n3. Build state management and setup relational database tables.\n4. Deploy production endpoints and verify output models.`,
+          rootPlan: `1. Initialize software blueprint for ${cleanTitle}.\n2. Configure client-side routes and components for ${projectType}.\n3. Build state management and setup relational database tables.\n4. Deploy production endpoints and verify output models.`,
           html: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>${cleanTitle}</title>\n</head>\n<body>\n  <div id="app"></div>\n</body>\n</html>`,
-          css: `body {\n  margin: 0;\n  background-color: #ffffff;\n  color: #111827;\n  font-family: system-ui, sans-serif;\n}`,
+          css: `body {\n  margin: 0;\n  background-color: #0f172a;\n  color: #f8fafc;\n  font-family: system-ui, sans-serif;\n}`,
           mainJs: `console.log("Initialized ${cleanTitle} successfully.");`,
-          appJsx: `export default function App() {\n  return (\n    <div className="p-4">\n      <h1>Welcome to ${cleanTitle}</h1>\n      <p>Type: ${projectType}</p>\n    </div>\n  );\n}`,
+          appJsx: `export default function App() {\n  return (\n    <div>\n      <h1>Welcome to ${cleanTitle}</h1>\n      <p>Type: ${projectType}</p>\n    </div>\n  );\n}`,
           sql: `CREATE DATABASE IF NOT EXISTS ${dbName}_db;\nUSE ${dbName}_db;\n\nCREATE TABLE users (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  username VARCHAR(50) NOT NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);`
         });
       };
 
       return (
-        <div className="flex h-screen w-full bg-white text-gray-900">
-          
-          <!-- Left Minimal Sidebar -->
-          <aside className="w-16 border-r border-gray-200 flex flex-col items-center justify-between py-4 bg-gray-50">
-            <div className="flex flex-col items-center gap-6">
-              <div className="text-gray-800 text-xl font-bold cursor-pointer">
-                <i className="fa-solid fa-bolt"></i>
-              </div>
-              <button className="text-gray-600 hover:text-black text-lg p-2 rounded-lg hover:bg-gray-200">
-                <i className="fa-regular fa-pen-to-square"></i>
-              </button>
-              <button className="text-gray-600 hover:text-black text-lg p-2 rounded-lg hover:bg-gray-200">
-                <i className="fa-solid fa-magnifying-glass"></i>
-              </button>
-              <button className="text-gray-600 hover:text-black text-lg p-2 rounded-lg hover:bg-gray-200">
-                <i className="fa-regular fa-comment"></i>
-              </button>
-            </div>
-            
-            <div className="w-8 h-8 rounded-full bg-orange-400 text-white flex items-center justify-center font-bold text-xs">
-              V
-            </div>
-          </aside>
+        <div className="max-w-5xl mx-auto p-6 font-sans">
+          <header className="mb-8 border-b border-slate-700 pb-4">
+            <h1 className="text-3xl font-bold text-blue-400">⚡ AI ProjectGPT Creator</h1>
+            <p className="text-slate-400 mt-1">Generate project blueprints and code files instantly.</p>
+          </header>
 
-          <!-- Main Chat Container -->
-          <main className="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar relative">
-            
-            <!-- Top Mode Switcher Header -->
-            <header className="flex items-center justify-between px-6 py-3 border-b border-gray-100">
-              <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-full text-sm font-medium">
-                <button className="bg-white text-gray-900 px-4 py-1.5 rounded-full shadow-sm">
-                  Chat
-                </button>
-                <button className="text-gray-500 hover:text-gray-800 px-4 py-1.5 rounded-full">
-                  ✦ Work
-                </button>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 font-medium text-sm border border-blue-200 px-3 py-1.5 rounded-full hover:bg-blue-50">
-                  ✦ Upgrade
-                </button>
-              </div>
-            </header>
-
-            <!-- Center Content Area -->
-            <div className="flex-1 flex flex-col items-center justify-center px-4 max-w-3xl mx-auto w-full py-8">
-              
-              {!output ? (
-                <h1 className="text-3xl font-semibold text-gray-800 mb-8 text-center">
-                  How can I help, Vasu?
-                </h1>
-              ) : (
-                <div className="w-full mb-6 bg-gray-900 rounded-xl overflow-hidden shadow-lg border border-gray-800">
-                  <div className="flex border-b border-gray-800 bg-gray-950 overflow-x-auto">
-                    {['rootPlan', 'html', 'css', 'mainJs', 'appJsx', 'sql'].map((tab) => (
-                      <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`px-4 py-3 font-mono text-xs uppercase font-bold transition-colors ${
-                          activeTab === tab
-                            ? 'text-white bg-gray-800 border-b-2 border-blue-500'
-                            : 'text-gray-400 hover:text-white'
-                        }`}
-                      >
-                        {tab === 'rootPlan' ? 'Root Plan' : tab}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="p-4 font-mono text-sm overflow-x-auto min-h-[260px] bg-gray-950">
-                    <pre className="text-emerald-400 whitespace-pre-wrap">{output[activeTab]}</pre>
-                  </div>
-                </div>
-              )}
-
-              <!-- ChatGPT Input Bar -->
-              <form onSubmit={handleGenerate} className="w-full relative">
-                <div className="bg-gray-100 rounded-3xl border border-gray-200 p-3 shadow-sm focus-within:shadow-md focus-within:border-gray-300 transition-all">
-                  
-                  <div className="flex items-center gap-2 mb-2 px-2">
-                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Type:</span>
-                    <select
-                      value={projectType}
-                      onChange={(e) => setProjectType(e.target.value)}
-                      className="bg-transparent text-xs font-medium text-gray-700 focus:outline-none cursor-pointer"
-                    >
-                      {projectOptions.map((opt) => (
-                        <option key={opt} value={opt}>{opt}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button type="button" className="text-gray-500 hover:text-black p-2 rounded-full">
-                      <i className="fa-solid fa-plus"></i>
-                    </button>
-                    
-                    <input
-                      type="text"
-                      placeholder="Ask anything or describe your project..."
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      className="w-full bg-transparent text-gray-800 placeholder-gray-400 focus:outline-none text-sm px-1"
-                    />
-
-                    <div className="flex items-center gap-2">
-                      <button type="button" className="text-gray-400 hover:text-gray-600 px-2 py-1 rounded-md text-xs font-medium border border-gray-300 flex items-center gap-1">
-                        <i className="fa-solid fa-brain"></i> Think
-                      </button>
-                      <button type="button" className="text-gray-500 hover:text-black p-2">
-                        <i className="fa-solid fa-microphone"></i>
-                      </button>
-                      <button
-                        type="submit"
-                        className={`p-2.5 rounded-full text-white transition-all ${
-                          prompt.trim() ? 'bg-black hover:bg-gray-800' : 'bg-gray-300 cursor-not-allowed'
-                        }`}
-                      >
-                        <i className="fa-solid fa-arrow-up"></i>
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
-              </form>
-
+          <form onSubmit={handleGenerate} className="bg-slate-800 p-6 rounded-lg border border-slate-700 space-y-4 mb-8 shadow-lg">
+            <div>
+              <label className="block text-sm font-semibold mb-2">Select Project Type:</label>
+              <select
+                value={projectType}
+                onChange={(e) => setProjectType(e.target.value)}
+                className="w-full bg-slate-700 p-2.5 rounded text-white border border-slate-600 focus:outline-none focus:border-blue-500"
+              >
+                {projectOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
             </div>
 
-          </main>
+            <div>
+              <label className="block text-sm font-semibold mb-2">Project Name:</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. EcoStore, DevFlow Dashboard"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full bg-slate-700 p-2.5 rounded text-white border border-slate-600 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2">Description & Features:</label>
+              <textarea
+                required
+                rows="3"
+                placeholder="Describe key requirements..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full bg-slate-700 p-2.5 rounded text-white border border-slate-600 focus:outline-none focus:border-blue-500"
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 font-bold py-2.5 px-6 rounded text-white transition-colors cursor-pointer"
+            >
+              Generate Full Codebase
+            </button>
+          </form>
+
+          {output && (
+            <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden shadow-xl">
+              <div className="flex border-b border-slate-700 bg-slate-900 overflow-x-auto">
+                {['rootPlan', 'html', 'css', 'mainJs', 'appJsx', 'sql'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-3 font-mono text-sm uppercase font-bold border-b-2 transition-colors ${
+                      activeTab === tab
+                        ? 'border-blue-500 text-blue-400 bg-slate-800'
+                        : 'border-transparent text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {tab === 'rootPlan' ? 'Root Plan' : tab}
+                  </button>
+                ))}
+              </div>
+
+              <div className="p-4 bg-slate-950 font-mono text-sm overflow-x-auto min-h-[250px]">
+                <pre className="text-emerald-400 whitespace-pre-wrap">{output[activeTab]}</pre>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
