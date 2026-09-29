@@ -1,13 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI ProjectGPT Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-slate-900 text-white min-h-screen">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI ProjectGPT Generator</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel Standalone (Compiles JSX directly in the browser) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen">
+  <div id="root"></div>
+
+  <!-- Inline React Component (Runs Everywhere without Node/Vite) -->
+  <script type="text/babel">
+    const { useState } = React;
+
+    function App() {
+      const [projectType, setProjectType] = useState('E-Commerce Web Application');
+      const [title, setTitle] = useState('');
+      const [description, setDescription] = useState('');
+      const [output, setOutput] = useState(null);
+      const [activeTab, setActiveTab] = useState('rootPlan');
+
+      const projectOptions = [
+        'E-Commerce Web Application',
+        'SaaS Analytics Dashboard',
+        'Social Media App',
+        'AI Chatbot Application',
+        'Blogging & CMS Platform',
+        'REST API Backend Microservice'
+      ];
+
+      const handleGenerate = (e) => {
+        e.preventDefault();
+        
+        const cleanTitle = title || 'MyProject';
+        const dbName = cleanTitle.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+        setOutput({
+          rootPlan: `1. Initialize software blueprint for ${cleanTitle}.\n2. Configure client-side routes and components for ${projectType}.\n3. Build state management and setup relational database tables.\n4. Deploy production endpoints and verify output models.`,
+          html: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>${cleanTitle}</title>\n</head>\n<body>\n  <div id="app"></div>\n</body>\n</html>`,
+          css: `body {\n  margin: 0;\n  background-color: #0f172a;\n  color: #f8fafc;\n  font-family: system-ui, sans-serif;\n}`,
+          mainJs: `console.log("Initialized ${cleanTitle} successfully.");`,
+          appJsx: `export default function App() {\n  return (\n    <div>\n      <h1>Welcome to ${cleanTitle}</h1>\n      <p>Type: ${projectType}</p>\n    </div>\n  );\n}`,
+          sql: `CREATE DATABASE IF NOT EXISTS ${dbName}_db;\nUSE ${dbName}_db;\n\nCREATE TABLE users (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  username VARCHAR(50) NOT NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);`
+        });
+      };
+
+      return (
+        <div className="max-w-5xl mx-auto p-6 font-sans">
+          <header className="mb-8 border-b border-slate-700 pb-4">
+            <h1 className="text-3xl font-bold text-blue-400">⚡ AI ProjectGPT Creator</h1>
+            <p className="text-slate-400 mt-1">Generate project blueprints and code files instantly.</p>
+          </header>
+
+          <form onSubmit={handleGenerate} className="bg-slate-800 p-6 rounded-lg border border-slate-700 space-y-4 mb-8 shadow-lg">
+            <div>
+              <label className="block text-sm font-semibold mb-2">Select Project Type:</label>
+              <select
+                value={projectType}
+                onChange={(e) => setProjectType(e.target.value)}
+                className="w-full bg-slate-700 p-2.5 rounded text-white border border-slate-600 focus:outline-none focus:border-blue-500"
+              >
+                {projectOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2">Project Name:</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. EcoStore, DevFlow Dashboard"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full bg-slate-700 p-2.5 rounded text-white border border-slate-600 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2">Description & Features:</label>
+              <textarea
+                required
+                rows="3"
+                placeholder="Describe key requirements..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full bg-slate-700 p-2.5 rounded text-white border border-slate-600 focus:outline-none focus:border-blue-500"
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 font-bold py-2.5 px-6 rounded text-white transition-colors cursor-pointer"
+            >
+              Generate Full Codebase
+            </button>
+          </form>
+
+          {output && (
+            <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden shadow-xl">
+              <div className="flex border-b border-slate-700 bg-slate-900 overflow-x-auto">
+                {['rootPlan', 'html', 'css', 'mainJs', 'appJsx', 'sql'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-3 font-mono text-sm uppercase font-bold border-b-2 transition-colors ${
+                      activeTab === tab
+                        ? 'border-blue-500 text-blue-400 bg-slate-800'
+                        : 'border-transparent text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {tab === 'rootPlan' ? 'Root Plan' : tab}
+                  </button>
+                ))}
+              </div>
+
+              <div className="p-4 bg-slate-950 font-mono text-sm overflow-x-auto min-h-[250px]">
+                <pre className="text-emerald-400 whitespace-pre-wrap">{output[activeTab]}</pre>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
 </html>
