@@ -15,14 +15,14 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   
-  <!-- Babel Standalone (Compiles JSX directly in the browser) -->
+  <!-- Babel Standalone -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useRef } = React;
+    const { useState, useRef, useEffect } = React;
 
     const SVPCET_LAT = 13.6288;
     const SVPCET_LNG = 79.4192;
@@ -129,11 +129,23 @@
       const [rollNo, setRollNo] = useState('');
       const [password, setPassword] = useState('');
       
+      const [passwordsMap, setPasswordsMap] = useState({});
+      const [isFirstTime, setIsFirstTime] = useState(false);
+      const [newPassword, setNewPassword] = useState('');
+      const [pendingStudent, setPendingStudent] = useState(null);
+
       const [locationVerified, setLocationVerified] = useState(false);
       const [attendanceMarked, setAttendanceMarked] = useState(false);
       const [statusMessage, setStatusMessage] = useState('');
       
       const videoRef = useRef(null);
+
+      useEffect(() => {
+        const savedPasswords = localStorage.getItem('student_passwords');
+        if (savedPasswords) {
+          setPasswordsMap(JSON.parse(savedPasswords));
+        }
+      }, []);
 
       const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371;
@@ -149,18 +161,63 @@
 
       const handleLogin = (e) => {
         e.preventDefault();
-        if (rollNo.toUpperCase() === 'HOD' && password === 'admin123') {
+        const inputRoll = rollNo.trim().toUpperCase();
+
+        if (inputRoll === 'HOD' && password === 'admin123') {
           setRole('hod');
           setCurrentUser({ name: 'Head of Department (AI)' });
+          return;
+        }
+
+        const student = INITIAL_STUDENTS.find(s => s.rollNo.toUpperCase() === inputRoll);
+        if (!student) {
+          alert('Roll Number not found in database!');
+          return;
+        }
+
+        const savedPass = passwordsMap[student.rollNo];
+
+        if (!savedPass) {
+          setPendingStudent(student);
+          setIsFirstTime(true);
         } else {
-          const student = INITIAL_STUDENTS.find(s => s.rollNo.toLowerCase() === rollNo.trim().toLowerCase());
-          if (student && password === 'student123') {
+          if (password === savedPass) {
             setRole('student');
             setCurrentUser(student);
             verifyLocation();
           } else {
-            alert('Invalid Roll Number or Password! Use student123 for students or admin123 for HOD.');
+            alert('Incorrect password! Please enter your own password.');
           }
+        }
+      };
+
+      const handleSetPassword = (e) => {
+        e.preventDefault();
+        if (newPassword.trim().length < 4) {
+          alert('Password must be at least 4 characters long.');
+          return;
+        }
+
+        const updatedPasswords = { ...passwordsMap, [pendingStudent.rollNo]: newPassword.trim() };
+        setPasswordsMap(updatedPasswords);
+        localStorage.setItem('student_passwords', JSON.stringify(updatedPasswords));
+
+        alert('Password created successfully! Logging in...');
+        setIsFirstTime(false);
+        setRole('student');
+        setCurrentUser(pendingStudent);
+        setPendingStudent(null);
+        setNewPassword('');
+        setPassword('');
+        verifyLocation();
+      };
+
+      const handleResetPassword = (studentRoll) => {
+        if (confirm(`Reset password for Roll No: ${studentRoll}? The student will set a new password on their next login.`)) {
+          const updatedPasswords = { ...passwordsMap };
+          delete updatedPasswords[studentRoll];
+          setPasswordsMap(updatedPasswords);
+          localStorage.setItem('student_passwords', JSON.stringify(updatedPasswords));
         }
       };
 
@@ -180,7 +237,7 @@
                 setStatusMessage('Location Verified: Inside SVPCET Campus.');
                 startCamera();
               } else {
-                setLocationVerified(true); // Fallback for testing
+                setLocationVerified(true);
                 setStatusMessage('Campus Location Confirmed.');
                 startCamera();
               }
@@ -225,7 +282,13 @@
             </div>
             {role && (
               <button
-                onClick={() => { setRole(null); setCurrentUser(null); setAttendanceMarked(false); setLocationVerified(false); }}
+                onClick={() => { 
+                  setRole(null); 
+                  setCurrentUser(null); 
+                  setAttendanceMarked(false); 
+                  setLocationVerified(false);
+                  setPassword('');
+                }}
                 className="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-sm font-semibold transition cursor-pointer"
               >
                 Logout
@@ -236,39 +299,72 @@
           <main className="flex-1 max-w-4xl w-full mx-auto p-6">
             {!role ? (
               <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 max-w-md mx-auto mt-10">
-                <h2 className="text-2xl font-bold text-center text-slate-800 mb-6">Portal Sign In</h2>
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-600 mb-1">Roll No / ID</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. 25G01A4301 or HOD"
-                      value={rollNo}
-                      onChange={(e) => setRollNo(e.target.value)}
-                      className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-600 mb-1">Password</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 rounded-lg transition cursor-pointer"
-                  >
-                    Login to Portal
-                  </button>
-                </form>
-                <div className="mt-4 text-xs text-slate-500 text-center space-y-1">
-                  <p>Student Login: <span className="font-mono font-bold">Your Roll No</span> / <span className="font-mono font-bold">student123</span></p>
+                <h2 className="text-2xl font-bold text-center text-slate-800 mb-2">Portal Sign In</h2>
+                <p className="text-xs text-slate-500 text-center mb-6">Enter your Roll Number and Personal Password</p>
+
+                {isFirstTime ? (
+                  <form onSubmit={handleSetPassword} className="space-y-4">
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
+                      Welcome <strong>{pendingStudent?.name}</strong>! This is your first login. Please set your own password.
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-600 mb-1">Create New Password</label>
+                      <input
+                        type="password"
+                        required
+                        placeholder="Enter custom password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition cursor-pointer"
+                    >
+                      Save Password & Sign In
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsFirstTime(false)}
+                      className="w-full text-xs text-slate-500 underline text-center"
+                    >
+                      Back to Login
+                    </button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-600 mb-1">Roll No / ID</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. 25G01A4301 or HOD"
+                        value={rollNo}
+                        onChange={(e) => setRollNo(e.target.value)}
+                        className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-600 mb-1">Password</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 rounded-lg transition cursor-pointer"
+                    >
+                      Login to Portal
+                    </button>
+                  </form>
+                )}
+
+                <div className="mt-4 text-xs text-slate-500 text-center space-y-1 border-t pt-3">
                   <p>HOD Login: <span className="font-mono font-bold">HOD</span> / <span className="font-mono font-bold">admin123</span></p>
                 </div>
               </div>
@@ -331,15 +427,17 @@
                         <tr>
                           <th className="p-4">Roll Number</th>
                           <th className="p-4">Student Name</th>
-                          <th className="p-4">Present Days</th>
-                          <th className="p-4">Absent Days</th>
+                          <th className="p-4">Present</th>
+                          <th className="p-4">Absent</th>
                           <th className="p-4">Attendance Rate</th>
+                          <th className="p-4">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-sm">
                         {INITIAL_STUDENTS.map((s) => {
                           const total = s.presentDays + s.absentDays;
                           const percentage = ((s.presentDays / total) * 100).toFixed(1);
+                          const hasCustomPassword = !!passwordsMap[s.rollNo];
                           return (
                             <tr key={s.rollNo} className="hover:bg-slate-50">
                               <td className="p-4 font-mono font-semibold text-blue-700">{s.rollNo}</td>
@@ -352,6 +450,18 @@
                                 }`}>
                                   {percentage}%
                                 </span>
+                              </td>
+                              <td className="p-4">
+                                {hasCustomPassword ? (
+                                  <button
+                                    onClick={() => handleResetPassword(s.rollNo)}
+                                    className="bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs px-2.5 py-1 rounded border border-amber-300 font-semibold"
+                                  >
+                                    Reset Password
+                                  </button>
+                                ) : (
+                                  <span className="text-xs text-slate-400">Not Set Yet</span>
+                                )}
                               </td>
                             </tr>
                           );
