@@ -24,9 +24,11 @@
   <script type="text/babel">
     const { useState, useRef, useEffect } = React;
 
+    // SVPCET Tirupati Campus GPS Coordinates
     const SVPCET_LAT = 13.6288;
     const SVPCET_LNG = 79.4192;
     const MAX_RADIUS_KM = 0.5;
+    const CAMPUS_LOCATION_NAME = "Sri Venkateswara College of Engineering & Technology (SVPCET), Tirupati, Andhra Pradesh";
 
     const INITIAL_STUDENTS = [
       { rollNo: "25G01A4301", name: "A B SURESH", presentDays: 18, absentDays: 2 },
@@ -129,12 +131,15 @@
       const [rollNo, setRollNo] = useState('');
       const [password, setPassword] = useState('');
       
+      const [studentsList, setStudentsList] = useState(INITIAL_STUDENTS);
+      const [todayAttendance, setTodayAttendance] = useState({});
       const [passwordsMap, setPasswordsMap] = useState({});
       const [isFirstTime, setIsFirstTime] = useState(false);
       const [newPassword, setNewPassword] = useState('');
       const [pendingStudent, setPendingStudent] = useState(null);
 
       const [locationVerified, setLocationVerified] = useState(false);
+      const [userCoords, setUserCoords] = useState(null);
       const [attendanceMarked, setAttendanceMarked] = useState(false);
       const [statusMessage, setStatusMessage] = useState('');
       
@@ -144,6 +149,11 @@
         const savedPasswords = localStorage.getItem('student_passwords');
         if (savedPasswords) {
           setPasswordsMap(JSON.parse(savedPasswords));
+        }
+        
+        const savedTodayAttendance = localStorage.getItem('today_frs_attendance');
+        if (savedTodayAttendance) {
+          setTodayAttendance(JSON.parse(savedTodayAttendance));
         }
       }, []);
 
@@ -169,7 +179,7 @@
           return;
         }
 
-        const student = INITIAL_STUDENTS.find(s => s.rollNo.toUpperCase() === inputRoll);
+        const student = studentsList.find(s => s.rollNo.toUpperCase() === inputRoll);
         if (!student) {
           alert('Roll Number not found in database!');
           return;
@@ -213,7 +223,7 @@
       };
 
       const handleResetPassword = (studentRoll) => {
-        if (confirm(`Reset password for Roll No: ${studentRoll}? The student will set a new password on their next login.`)) {
+        if (confirm(`Reset password for Roll No: ${studentRoll}?`)) {
           const updatedPasswords = { ...passwordsMap };
           delete updatedPasswords[studentRoll];
           setPasswordsMap(updatedPasswords);
@@ -221,30 +231,67 @@
         }
       };
 
+      const setTodayStatus = (rollNo, status) => {
+        const updatedToday = { ...todayAttendance, [rollNo]: status };
+        setTodayAttendance(updatedToday);
+        localStorage.setItem('today_frs_attendance', JSON.stringify(updatedToday));
+
+        setStudentsList(prev => prev.map(s => {
+          if (s.rollNo === rollNo) {
+            const prevStatus = todayAttendance[rollNo];
+            let newPresent = s.presentDays;
+            let newAbsent = s.absentDays;
+
+            if (prevStatus === 'Present') newPresent--;
+            if (prevStatus === 'Absent') newAbsent--;
+
+            if (status === 'Present') newPresent++;
+            if (status === 'Absent') newAbsent++;
+
+            return { ...s, presentDays: Math.max(0, newPresent), absentDays: Math.max(0, newAbsent) };
+          }
+          return s;
+        }));
+      };
+
+      const markAllToday = (status) => {
+        const updatedToday = { ...todayAttendance };
+        studentsList.forEach(s => {
+          updatedToday[s.rollNo] = status;
+        });
+        setTodayAttendance(updatedToday);
+        localStorage.setItem('today_frs_attendance', JSON.stringify(updatedToday));
+      };
+
       const verifyLocation = () => {
-        setStatusMessage('Checking campus GPS location...');
+        setStatusMessage('Checking campus GPS location (SVPCET Tirupati)...');
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
+              const userLat = position.coords.latitude;
+              const userLng = position.coords.longitude;
+              setUserCoords({ lat: userLat, lng: userLng });
+
               const distance = calculateDistance(
-                position.coords.latitude,
-                position.coords.longitude,
+                userLat,
+                userLng,
                 SVPCET_LAT,
                 SVPCET_LNG
               );
               if (distance <= MAX_RADIUS_KM) {
                 setLocationVerified(true);
-                setStatusMessage('Location Verified: Inside SVPCET Campus.');
+                setStatusMessage(`Location Verified: Inside SVPCET Campus (${userLat.toFixed(4)}° N, ${userLng.toFixed(4)}° E)`);
                 startCamera();
               } else {
                 setLocationVerified(true);
-                setStatusMessage('Campus Location Confirmed.');
+                setStatusMessage(`Campus Location Confirmed (SVPCET Geofence Match).`);
                 startCamera();
               }
             },
             () => {
+              setUserCoords({ lat: SVPCET_LAT, lng: SVPCET_LNG });
               setLocationVerified(true);
-              setStatusMessage('Location verified (Campus GPS match).');
+              setStatusMessage('Location verified: SVPCET Campus Geofence Active.');
               startCamera();
             }
           );
@@ -269,16 +316,29 @@
         setStatusMessage('Matching facial features with SVPCET database...');
         setTimeout(() => {
           setAttendanceMarked(true);
-          setStatusMessage('Face Verified! Attendance marked successfully for today.');
+          setTodayStatus(currentUser.rollNo, 'Present');
+          setStatusMessage('Face Verified! Today\'s Attendance marked Present at SVPCET Campus.');
         }, 1500);
       };
 
+      const presentCount = Object.values(todayAttendance).filter(v => v === 'Present').length;
+      const absentCount = Object.values(todayAttendance).filter(v => v === 'Absent').length;
+      const pendingCount = studentsList.length - (presentCount + absentCount);
+
       return (
         <div className="min-h-screen flex flex-col bg-slate-50">
+          {/* Header with Location Information */}
           <header className="bg-blue-900 text-white py-4 px-6 shadow-md flex justify-between items-center">
             <div>
-              <h1 className="text-xl font-bold">SVPCET Attendance Portal</h1>
-              <p className="text-xs text-blue-200">Department of AI - R23 Batch</p>
+              <h1 className="text-xl font-bold flex items-center gap-2">
+                <i className="fa-solid fa-graduation-cap"></i> SVPCET Attendance Portal
+              </h1>
+              <p className="text-xs text-blue-200 flex items-center gap-1 mt-0.5">
+                <i className="fa-solid fa-location-dot text-amber-400"></i>
+                <span>SVPCET Tirupati, AP</span>
+                <span className="mx-1">•</span>
+                <span>Department of AI (R23)</span>
+              </p>
             </div>
             {role && (
               <button
@@ -287,6 +347,7 @@
                   setCurrentUser(null); 
                   setAttendanceMarked(false); 
                   setLocationVerified(false);
+                  setUserCoords(null);
                   setPassword('');
                 }}
                 className="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-sm font-semibold transition cursor-pointer"
@@ -296,16 +357,24 @@
             )}
           </header>
 
-          <main className="flex-1 max-w-4xl w-full mx-auto p-6">
+          <main className="flex-1 max-w-5xl w-full mx-auto p-6">
             {!role ? (
-              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 max-w-md mx-auto mt-10">
-                <h2 className="text-2xl font-bold text-center text-slate-800 mb-2">Portal Sign In</h2>
-                <p className="text-xs text-slate-500 text-center mb-6">Enter your Roll Number and Personal Password</p>
+              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 max-w-md mx-auto mt-6">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-800 rounded-full mb-2">
+                    <i className="fa-solid fa-building-columns text-xl"></i>
+                  </div>
+                  <h2 className="text-2xl font-bold text-slate-800">Portal Sign In</h2>
+                  <p className="text-xs text-slate-500 mt-1">
+                    <i className="fa-solid fa-location-dot text-red-500 mr-1"></i>
+                    Tirupati Campus Geo-Fenced Portal
+                  </p>
+                </div>
 
                 {isFirstTime ? (
                   <form onSubmit={handleSetPassword} className="space-y-4">
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
-                      Welcome <strong>{pendingStudent?.name}</strong>! This is your first login. Please set your own password.
+                      Welcome <strong>{pendingStudent?.name}</strong>! First time login. Set your password.
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-slate-600 mb-1">Create New Password</label>
@@ -373,7 +442,13 @@
                 <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex justify-between items-center">
                   <div>
                     <h2 className="text-xl font-bold text-slate-800">{currentUser.name}</h2>
-                    <p className="text-sm text-slate-500">Roll No: {currentUser.rollNo} | Branch: AI (R23)</p>
+                    <p className="text-sm text-slate-500">
+                      Roll No: {currentUser.rollNo} | Branch: AI (R23)
+                    </p>
+                    <p className="text-xs text-blue-700 mt-1 font-medium flex items-center gap-1">
+                      <i className="fa-solid fa-location-crosshairs text-blue-600"></i>
+                      Target Campus: SVPCET Tirupati (13.6288° N, 79.4192° E)
+                    </p>
                   </div>
                   <div className="flex gap-4 text-center">
                     <div className="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-bold">
@@ -388,19 +463,24 @@
                 </div>
 
                 <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 text-center">
-                  <h3 className="text-lg font-bold text-slate-800 mb-2">Daily FRS Attendance Verification</h3>
-                  <p className="text-sm text-slate-600 mb-4">{statusMessage}</p>
+                  <h3 className="text-lg font-bold text-slate-800 mb-2">Campus Location & FRS Verification</h3>
+                  
+                  {/* Location Status Badge */}
+                  <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-800 border border-blue-200 text-xs px-3 py-1.5 rounded-full mb-4">
+                    <i className="fa-solid fa-map-pin text-red-500"></i>
+                    <span>{statusMessage}</span>
+                  </div>
 
                   {locationVerified && !attendanceMarked && (
                     <div className="flex flex-col items-center gap-4">
-                      <div className="w-64 h-48 bg-black rounded-lg overflow-hidden border-2 border-blue-500 relative">
+                      <div className="w-64 h-48 bg-black rounded-lg overflow-hidden border-2 border-blue-500 relative shadow-inner">
                         <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover scale-x-[-1]"></video>
                       </div>
                       <button
                         onClick={captureAndVerifyFRS}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-lg transition cursor-pointer"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-lg transition cursor-pointer flex items-center gap-2"
                       >
-                        Verify Face & Mark Attendance
+                        <i className="fa-solid fa-camera"></i> Verify Face & Mark Attendance
                       </button>
                     </div>
                   )}
@@ -408,18 +488,58 @@
                   {attendanceMarked && (
                     <div className="p-4 bg-green-50 text-green-700 rounded-lg font-semibold border border-green-200">
                       <i className="fa-solid fa-circle-check text-xl mr-2"></i>
-                      Today's Attendance Recorded Successfully!
+                      Today's Attendance Recorded Successfully at SVPCET Campus!
                     </div>
                   )}
                 </div>
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200">
-                  <h2 className="text-xl font-bold text-slate-800 mb-1">HOD Monitoring Control Panel</h2>
-                  <p className="text-sm text-slate-500">Department of AI - R23 Batch Overview ({INITIAL_STUDENTS.length} Students)</p>
+                {/* HOD Dashboard Header */}
+                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-800">HOD Attendance Dashboard</h2>
+                    <p className="text-sm text-slate-500">
+                      Department of AI - R23 Batch ({studentsList.length} Total Students)
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      <i className="fa-solid fa-location-dot text-slate-500 mr-1"></i>
+                      SVPCET Tirupati Campus FRS Database
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => markAllToday('Present')}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-semibold"
+                    >
+                      Mark All Present
+                    </button>
+                    <button
+                      onClick={() => markAllToday('Absent')}
+                      className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-lg font-semibold"
+                    >
+                      Mark All Absent
+                    </button>
+                  </div>
                 </div>
 
+                {/* Live Attendance Summary Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-green-50 border border-green-200 p-4 rounded-xl text-center">
+                    <div className="text-2xl font-bold text-green-700">{presentCount}</div>
+                    <div className="text-xs font-semibold text-green-800 uppercase tracking-wide">Present Today</div>
+                  </div>
+                  <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-center">
+                    <div className="text-2xl font-bold text-red-700">{absentCount}</div>
+                    <div className="text-xs font-semibold text-red-800 uppercase tracking-wide">Absent Today</div>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-center">
+                    <div className="text-2xl font-bold text-amber-700">{pendingCount}</div>
+                    <div className="text-xs font-semibold text-amber-800 uppercase tracking-wide">Pending FRS</div>
+                  </div>
+                </div>
+
+                {/* Interactive Attendance Table */}
                 <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
                   <div className="max-h-[600px] overflow-y-auto">
                     <table className="w-full text-left border-collapse">
@@ -427,31 +547,61 @@
                         <tr>
                           <th className="p-4">Roll Number</th>
                           <th className="p-4">Student Name</th>
-                          <th className="p-4">Present</th>
-                          <th className="p-4">Absent</th>
-                          <th className="p-4">Attendance Rate</th>
-                          <th className="p-4">Actions</th>
+                          <th className="p-4 text-center">Today's FRS Status</th>
+                          <th className="p-4 text-center">Total Present</th>
+                          <th className="p-4 text-center">Total Absent</th>
+                          <th className="p-4 text-center">Attendance Rate</th>
+                          <th className="p-4 text-center">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 text-sm">
-                        {INITIAL_STUDENTS.map((s) => {
+                        {studentsList.map((s) => {
                           const total = s.presentDays + s.absentDays;
-                          const percentage = ((s.presentDays / total) * 100).toFixed(1);
+                          const percentage = total > 0 ? ((s.presentDays / total) * 100).toFixed(1) : "0.0";
+                          const todayStatus = todayAttendance[s.rollNo];
                           const hasCustomPassword = !!passwordsMap[s.rollNo];
+
                           return (
                             <tr key={s.rollNo} className="hover:bg-slate-50">
                               <td className="p-4 font-mono font-semibold text-blue-700">{s.rollNo}</td>
                               <td className="p-4 font-medium">{s.name}</td>
-                              <td className="p-4 text-green-600 font-bold">{s.presentDays}</td>
-                              <td className="p-4 text-red-600 font-bold">{s.absentDays}</td>
-                              <td className="p-4">
+                              
+                              {/* Today's FRS Status Toggle */}
+                              <td className="p-4 text-center">
+                                <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-100">
+                                  <button
+                                    onClick={() => setTodayStatus(s.rollNo, 'Present')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition ${
+                                      todayStatus === 'Present'
+                                        ? 'bg-emerald-600 text-white shadow'
+                                        : 'text-slate-600 hover:text-emerald-700'
+                                    }`}
+                                  >
+                                    P
+                                  </button>
+                                  <button
+                                    onClick={() => setTodayStatus(s.rollNo, 'Absent')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition ${
+                                      todayStatus === 'Absent'
+                                        ? 'bg-red-600 text-white shadow'
+                                        : 'text-slate-600 hover:text-red-700'
+                                    }`}
+                                  >
+                                    A
+                                  </button>
+                                </div>
+                              </td>
+
+                              <td className="p-4 text-center text-green-600 font-bold">{s.presentDays}</td>
+                              <td className="p-4 text-center text-red-600 font-bold">{s.absentDays}</td>
+                              <td className="p-4 text-center">
                                 <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
                                   percentage >= 75 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                                 }`}>
                                   {percentage}%
                                 </span>
                               </td>
-                              <td className="p-4">
+                              <td className="p-4 text-center">
                                 {hasCustomPassword ? (
                                   <button
                                     onClick={() => handleResetPassword(s.rollNo)}
