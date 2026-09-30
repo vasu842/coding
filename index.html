@@ -33,7 +33,7 @@
     const MAX_RADIUS_KM = 0.5;
 
     // Storage keys
-    const HISTORY_KEY = 'attendance_history_v2';   // { "YYYY-MM-DD": { rollNo: 'Present' | 'Absent' } }
+    const HISTORY_KEY = 'attendance_history_v3';   // { "YYYY-MM-DD": { rollNo: 'Present' | 'Absent' } }
     const PASSWORDS_KEY = 'student_passwords';     // { rollNo: password }
 
     // Face detection model files (tried in this order until one loads)
@@ -389,7 +389,7 @@
         if (!video || video.readyState < 2 || !video.videoWidth) return null;
         const results = await faceapi.detectAllFaces(
           video,
-          new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 })
+          new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.6 })
         );
         // Ignore tiny detections (far away / background objects)
         return results.filter(r => r.box.width / video.videoWidth >= 0.12);
@@ -506,6 +506,8 @@
                 <span>SVPCET Tirupati, AP</span>
                 <span className="mx-1">•</span>
                 <span>Department of AI (R23)</span>
+                <span className="mx-1">•</span>
+                <span className="bg-blue-800 px-1.5 py-0.5 rounded text-[10px] font-semibold text-amber-300">v3 real face scan</span>
               </p>
             </div>
             {role && (
