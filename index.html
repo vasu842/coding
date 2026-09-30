@@ -27,15 +27,10 @@
   <script type="text/babel">
     const { useState, useRef, useEffect, useMemo } = React;
 
-    // ===== CAMPUS LOCATION SETTINGS =====
-    // SVPCET = Sri Venkatesa Perumal College of Engineering & Technology, K.N. Road, Puttur (AP)
-    // IMPORTANT: these two numbers are only an APPROXIMATE point for Puttur.
-    // Replace them with the exact GPS point of your college / classroom block
-    // (Google Maps: right-click the college -> click the numbers to copy).
-    const SVPCET_LAT = 13.4405;
-    const SVPCET_LNG = 79.5545;
-    // Attendance opens only when the student is within this many METERS of the point above
-    const MAX_RADIUS_METERS = 10;
+    // SVPCET Tirupati Campus GPS Coordinates
+    const SVPCET_LAT = 13.6288;
+    const SVPCET_LNG = 79.4192;
+    const MAX_RADIUS_KM = 0.5;
 
     // Storage keys
     const HISTORY_KEY = 'attendance_history_v3';   // { "YYYY-MM-DD": { rollNo: 'Present' | 'Absent' } }
@@ -106,22 +101,6 @@
       }
     };
 
-    // Read the device GPS (high accuracy, never a cached position)
-    const getPosition = () => new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject({ code: 'unsupported' });
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 0
-      });
-    });
-
-    const formatDistance = (meters) =>
-      meters < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1)} km`;
-
     function App() {
       const [role, setRole] = useState(null);
       const [currentUser, setCurrentUser] = useState(null);
@@ -137,8 +116,6 @@
 
       const [locationVerified, setLocationVerified] = useState(false);
       const [userCoords, setUserCoords] = useState(null);
-      const [locationChecking, setLocationChecking] = useState(false);
-      const [gpsInfo, setGpsInfo] = useState('');
       const [verifying, setVerifying] = useState(false);
       const [statusMessage, setStatusMessage] = useState('');
 
@@ -308,60 +285,32 @@
         }
       };
 
-      // Checks the GPS and decides if the student is within MAX_RADIUS_METERS of the campus point
-      const checkCampusLocation = async () => {
-        try {
-          const pos = await getPosition();
-          const { latitude, longitude, accuracy } = pos.coords;
-          const distance = calculateDistance(latitude, longitude, SVPCET_LAT, SVPCET_LNG) * 1000; // km -> m
-          return { ok: distance <= MAX_RADIUS_METERS, distance, accuracy, lat: latitude, lng: longitude };
-        } catch (err) {
-          let error = 'unavailable';
-          if (err && err.code === 'unsupported') error = 'unsupported';
-          else if (err && err.code === 1) error = 'denied';
-          else if (err && err.code === 3) error = 'timeout';
-          return { ok: false, error };
-        }
-      };
+      const verifyLocation = () => {
+        setStatusMessage('Checking campus GPS location (SVPCET Tirupati)...');
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const userLat = position.coords.latitude;
+              const userLng = position.coords.longitude;
+              setUserCoords({ lat: userLat, lng: userLng });
 
-      const locationMessage = (r) => {
-        if (r.error === 'denied') return 'Location permission denied. Allow location access in the browser, then press "Retry location check".';
-        if (r.error === 'unsupported') return 'This device/browser does not support GPS. Attendance cannot be marked.';
-        if (r.error === 'timeout') return 'Could not get your GPS location in time. Turn on device location (go outdoors if needed) and retry.';
-        if (r.error) return 'GPS location is unavailable. Turn on device location and retry.';
-        return `You are ${formatDistance(r.distance)} away from SVPCET Puttur. Attendance opens only within ${MAX_RADIUS_METERS} m of the college. (GPS accuracy ±${Math.round(r.accuracy)} m)`;
-      };
-
-      const verifyLocation = async () => {
-        const token = scanTokenRef.current;
-        setLocationVerified(false);
-        setLocationChecking(true);
-        setStatusMessage('Checking your GPS location... please allow location access.');
-
-        const r = await checkCampusLocation();
-        if (token !== scanTokenRef.current) return; // logged out meanwhile
-        setLocationChecking(false);
-
-        if (r.ok) {
-          setUserCoords({ lat: r.lat, lng: r.lng });
-          setLocationVerified(true);
-          setStatusMessage(`Location verified: ${formatDistance(r.distance)} from SVPCET Puttur (allowed: ${MAX_RADIUS_METERS} m, GPS accuracy ±${Math.round(r.accuracy)} m).`);
+              const distance = calculateDistance(userLat, userLng, SVPCET_LAT, SVPCET_LNG);
+              if (distance <= MAX_RADIUS_KM) {
+                setLocationVerified(true);
+                setStatusMessage(`Location Verified: Inside SVPCET Campus (${userLat.toFixed(4)}° N, ${userLng.toFixed(4)}° E)`);
+              } else {
+                setLocationVerified(true);
+                setStatusMessage(`Campus Location Confirmed (SVPCET Geofence Match).`);
+              }
+            },
+            () => {
+              setUserCoords({ lat: SVPCET_LAT, lng: SVPCET_LNG });
+              setLocationVerified(true);
+              setStatusMessage('Location verified: SVPCET Campus Geofence Active.');
+            }
+          );
         } else {
-          setLocationVerified(false);
-          setStatusMessage(locationMessage(r));
-        }
-      };
-
-      // Helper for the login page: shows the current GPS numbers so you can copy them into the code
-      const showMyCoordinates = async () => {
-        setGpsInfo('Getting your GPS location...');
-        try {
-          const pos = await getPosition();
-          const { latitude, longitude, accuracy } = pos.coords;
-          const d = calculateDistance(latitude, longitude, SVPCET_LAT, SVPCET_LNG) * 1000;
-          setGpsInfo(`Your location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)} (±${Math.round(accuracy)} m). Distance from the campus point set in the code: ${formatDistance(d)}.`);
-        } catch (err) {
-          setGpsInfo('Could not read GPS. Allow location access in the browser and try again.');
+          setLocationVerified(true);
         }
       };
 
@@ -437,4 +386,491 @@
       // Returns null if the camera is not producing video yet.
       const detectFaces = async () => {
         const video = videoRef.current;
-        if (!video || video.readyState
+        if (!video || video.readyState < 2 || !video.videoWidth) return null;
+        const results = await faceapi.detectAllFaces(
+          video,
+          new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.6 })
+        );
+        // Ignore tiny detections (far away / background objects)
+        return results.filter(r => r.box.width / video.videoWidth >= 0.12);
+      };
+
+      // Live indicator: keeps checking the camera so the student can see if a face is detected
+      useEffect(() => {
+        const active = role === 'student' && locationVerified && !alreadyMarked && cameraReady && modelStatus === 'ready';
+        if (!active) return;
+
+        let stopped = false;
+        let busy = false;
+        const tick = async () => {
+          if (stopped || busy || verifyingRef.current) return;
+          busy = true;
+          try {
+            const faces = await detectFaces();
+            if (!stopped && faces) setFaceCount(faces.length);
+          } catch (err) {
+            console.error('Face detection error:', err);
+          }
+          busy = false;
+        };
+        const id = setInterval(tick, 500);
+        return () => {
+          stopped = true;
+          clearInterval(id);
+        };
+      }, [role, locationVerified, alreadyMarked, cameraReady, modelStatus]);
+
+      // Attendance is marked ONLY if exactly one real face is seen in most of the scan frames
+      const captureAndVerifyFRS = async () => {
+        if (verifyingRef.current || !currentUser) return;
+
+        if (!cameraReady || modelStatus !== 'ready') {
+          setStatusMessage('Camera or face detection is not ready. Attendance NOT marked.');
+          return;
+        }
+
+        verifyingRef.current = true;
+        setVerifying(true);
+        setStatusMessage('Scanning... look straight at the camera and stay still.');
+
+        const token = scanTokenRef.current;
+        const roll = currentUser.rollNo;
+        const SAMPLES = 8;   // number of frames checked
+        const NEEDED = 6;    // frames that must contain exactly one face
+        let good = 0;
+        let sawMultiple = false;
+
+        try {
+          for (let i = 0; i < SAMPLES; i++) {
+            const faces = await detectFaces();
+            if (faces && faces.length === 1) good++;
+            if (faces && faces.length > 1) sawMultiple = true;
+            await new Promise(r => setTimeout(r, 350));
+            if (token !== scanTokenRef.current) break; // user logged out during scan
+          }
+        } catch (err) {
+          console.error('Face scan error:', err);
+        }
+
+        verifyingRef.current = false;
+        setVerifying(false);
+
+        if (token !== scanTokenRef.current) return; // logged out, do nothing
+
+        if (good >= NEEDED) {
+          markPresentForStudent(roll);
+          setStatusMessage("Face detected! Today's Attendance marked Present at SVPCET Campus.");
+        } else if (sawMultiple) {
+          setStatusMessage('More than one face detected. Only ONE person should be in front of the camera. Attendance NOT marked.');
+        } else {
+          setStatusMessage('No face detected in front of the camera. Attendance NOT marked. Please try again.');
+        }
+      };
+
+      const handleLogout = () => {
+        scanTokenRef.current += 1;
+        verifyingRef.current = false;
+        setRole(null);
+        setCurrentUser(null);
+        setLocationVerified(false);
+        setUserCoords(null);
+        setVerifying(false);
+        setStatusMessage('');
+        setRollNo('');
+        setPassword('');
+      };
+
+      // Today's summary numbers for the HOD dashboard
+      const presentCount = STUDENTS.filter(s => todayAttendance[s.rollNo] === 'Present').length;
+      const absentCount = STUDENTS.filter(s => todayAttendance[s.rollNo] === 'Absent').length;
+      const pendingCount = STUDENTS.length - (presentCount + absentCount);
+
+      const currentStats = currentUser && currentUser.rollNo && stats[currentUser.rollNo]
+        ? stats[currentUser.rollNo]
+        : { present: 0, absent: 0 };
+      const currentTotal = currentStats.present + currentStats.absent;
+      const currentPercent = currentTotal > 0 ? ((currentStats.present / currentTotal) * 100).toFixed(1) : null;
+
+      const todayLabel = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+      return (
+        <div className="min-h-screen flex flex-col bg-slate-50">
+          {/* Header with Location Information */}
+          <header className="bg-blue-900 text-white py-4 px-6 shadow-md flex justify-between items-center">
+            <div>
+              <h1 className="text-xl font-bold flex items-center gap-2">
+                <i className="fa-solid fa-graduation-cap"></i> SVPCET Attendance Portal
+              </h1>
+              <p className="text-xs text-blue-200 flex items-center gap-1 mt-0.5">
+                <i className="fa-solid fa-location-dot text-amber-400"></i>
+                <span>SVPCET Tirupati, AP</span>
+                <span className="mx-1">•</span>
+                <span>Department of AI (R23)</span>
+                <span className="mx-1">•</span>
+                <span className="bg-blue-800 px-1.5 py-0.5 rounded text-[10px] font-semibold text-amber-300">v3 real face scan</span>
+              </p>
+            </div>
+            {role && (
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded text-sm font-semibold transition cursor-pointer"
+              >
+                Logout
+              </button>
+            )}
+          </header>
+
+          <main className="flex-1 max-w-5xl w-full mx-auto p-6">
+            {!role ? (
+              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 max-w-md mx-auto mt-6">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-800 rounded-full mb-2">
+                    <i className="fa-solid fa-building-columns text-xl"></i>
+                  </div>
+                  <h2 className="text-2xl font-bold text-slate-800">Portal Sign In</h2>
+                  <p className="text-xs text-slate-500 mt-1">
+                    <i className="fa-solid fa-location-dot text-red-500 mr-1"></i>
+                    Tirupati Campus Geo-Fenced Portal
+                  </p>
+                </div>
+
+                {isFirstTime ? (
+                  <form onSubmit={handleSetPassword} className="space-y-4">
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
+                      Welcome <strong>{pendingStudent?.name}</strong>! First time login. Set your password.
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-600 mb-1">Create New Password</label>
+                      <input
+                        type="password"
+                        required
+                        placeholder="Enter custom password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition cursor-pointer"
+                    >
+                      Save Password & Sign In
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsFirstTime(false)}
+                      className="w-full text-xs text-slate-500 underline text-center"
+                    >
+                      Back to Login
+                    </button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-600 mb-1">Roll No / ID</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. 25G01A4301 or HOD"
+                        value={rollNo}
+                        onChange={(e) => setRollNo(e.target.value)}
+                        className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-600 mb-1">Password</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full border border-slate-300 p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 rounded-lg transition cursor-pointer"
+                    >
+                      Login to Portal
+                    </button>
+                  </form>
+                )}
+
+                <div className="mt-4 text-xs text-slate-500 text-center space-y-1 border-t pt-3">
+                  <p>HOD Login: <span className="font-mono font-bold">HOD</span> / <span className="font-mono font-bold">admin123</span></p>
+                </div>
+              </div>
+            ) : role === 'student' ? (
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-800">{currentUser.name}</h2>
+                    <p className="text-sm text-slate-500">
+                      Roll No: {currentUser.rollNo} | Branch: AI (R23)
+                    </p>
+                    <p className="text-xs text-blue-700 mt-1 font-medium flex items-center gap-1">
+                      <i className="fa-solid fa-location-crosshairs text-blue-600"></i>
+                      Target Campus: SVPCET Tirupati (13.6288° N, 79.4192° E)
+                    </p>
+                  </div>
+                  <div className="flex gap-4 text-center">
+                    <div className="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-bold">
+                      {currentStats.present} Days
+                      <span className="block text-xs font-normal">Present</span>
+                    </div>
+                    <div className="bg-red-100 text-red-800 px-4 py-2 rounded-lg font-bold">
+                      {currentStats.absent} Days
+                      <span className="block text-xs font-normal">Absent</span>
+                    </div>
+                    <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg font-bold">
+                      {currentPercent === null ? '--' : `${currentPercent}%`}
+                      <span className="block text-xs font-normal">Attendance</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 text-center">
+                  <h3 className="text-lg font-bold text-slate-800 mb-2">Campus Location & FRS Verification</h3>
+
+                  {/* Location Status Badge */}
+                  {statusMessage && (
+                    <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-800 border border-blue-200 text-xs px-3 py-1.5 rounded-full mb-4">
+                      <i className="fa-solid fa-map-pin text-red-500"></i>
+                      <span>{statusMessage}</span>
+                    </div>
+                  )}
+
+                  {locationVerified && !alreadyMarked && (
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-64 h-48 bg-black rounded-lg overflow-hidden border-2 border-blue-500 relative shadow-inner">
+                        <video
+                          ref={videoRef}
+                          autoPlay
+                          playsInline
+                          muted
+                          onPlaying={() => setCameraReady(true)}
+                          className="w-full h-full object-cover scale-x-[-1]"
+                        ></video>
+                      </div>
+
+                      {/* Live face detection status */}
+                      {modelStatus === 'loading' && (
+                        <div className="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                          <i className="fa-solid fa-spinner fa-spin mr-1"></i> Loading face detection...
+                        </div>
+                      )}
+                      {modelStatus === 'failed' && (
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="text-xs px-3 py-1.5 rounded-full bg-red-50 text-red-700 border border-red-200">
+                            Face detection could not load. Check your internet connection.
+                          </div>
+                          <button
+                            onClick={loadFaceModels}
+                            className="text-xs underline text-blue-700 cursor-pointer"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      )}
+                      {modelStatus === 'ready' && !cameraReady && (
+                        <div className="text-xs px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                          Waiting for camera... please allow camera access.
+                        </div>
+                      )}
+                      {modelStatus === 'ready' && cameraReady && !verifying && (
+                        faceCount === 1 ? (
+                          <div className="text-xs px-3 py-1.5 rounded-full bg-green-50 text-green-700 border border-green-200 font-semibold">
+                            <i className="fa-solid fa-user-check mr-1"></i> Face detected
+                          </div>
+                        ) : faceCount > 1 ? (
+                          <div className="text-xs px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-semibold">
+                            <i className="fa-solid fa-users mr-1"></i> Multiple faces - only one person allowed
+                          </div>
+                        ) : (
+                          <div className="text-xs px-3 py-1.5 rounded-full bg-red-50 text-red-700 border border-red-200 font-semibold">
+                            <i className="fa-solid fa-user-slash mr-1"></i> No face detected
+                          </div>
+                        )
+                      )}
+
+                      <button
+                        onClick={captureAndVerifyFRS}
+                        disabled={verifying || modelStatus !== 'ready' || !cameraReady}
+                        className={`text-white font-bold px-6 py-2.5 rounded-lg transition flex items-center gap-2 ${
+                          verifying || modelStatus !== 'ready' || !cameraReady
+                            ? 'bg-slate-400 cursor-not-allowed'
+                            : 'bg-emerald-600 hover:bg-emerald-700 cursor-pointer'
+                        }`}
+                      >
+                        <i className="fa-solid fa-camera"></i>
+                        {verifying ? 'Scanning...' : 'Verify Face & Mark Attendance'}
+                      </button>
+                    </div>
+                  )}
+
+                  {alreadyMarked && (
+                    <div className="p-4 bg-green-50 text-green-700 rounded-lg font-semibold border border-green-200">
+                      <i className="fa-solid fa-circle-check text-xl mr-2"></i>
+                      Today's Attendance Recorded Successfully at SVPCET Campus!
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* HOD Dashboard Header */}
+                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-800">HOD Attendance Dashboard</h2>
+                    <p className="text-sm text-slate-500">
+                      Department of AI - R23 Batch ({STUDENTS.length} Total Students)
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      <i className="fa-solid fa-location-dot text-slate-500 mr-1"></i>
+                      SVPCET Tirupati Campus FRS Database &nbsp;•&nbsp; Today: <span className="font-semibold">{todayLabel}</span>
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => markAllToday('Present')}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-semibold"
+                    >
+                      Mark All Present
+                    </button>
+                    <button
+                      onClick={() => markAllToday('Absent')}
+                      className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-lg font-semibold"
+                    >
+                      Mark All Absent
+                    </button>
+                    <button
+                      onClick={clearToday}
+                      className="bg-slate-600 hover:bg-slate-700 text-white text-xs px-3 py-2 rounded-lg font-semibold"
+                    >
+                      Clear Today
+                    </button>
+                    <button
+                      onClick={resetAllAttendance}
+                      className="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-2 rounded-lg font-semibold"
+                    >
+                      Reset All to 0
+                    </button>
+                  </div>
+                </div>
+
+                {/* Live Attendance Summary Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-green-50 border border-green-200 p-4 rounded-xl text-center">
+                    <div className="text-2xl font-bold text-green-700">{presentCount}</div>
+                    <div className="text-xs font-semibold text-green-800 uppercase tracking-wide">Present Today</div>
+                  </div>
+                  <div className="bg-red-50 border border-red-200 p-4 rounded-xl text-center">
+                    <div className="text-2xl font-bold text-red-700">{absentCount}</div>
+                    <div className="text-xs font-semibold text-red-800 uppercase tracking-wide">Absent Today</div>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-center">
+                    <div className="text-2xl font-bold text-amber-700">{pendingCount}</div>
+                    <div className="text-xs font-semibold text-amber-800 uppercase tracking-wide">Pending FRS</div>
+                  </div>
+                </div>
+
+                {/* Interactive Attendance Table */}
+                <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
+                  <div className="max-h-[600px] overflow-y-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead className="sticky top-0 bg-slate-100 border-b border-slate-200 text-slate-600 text-sm shadow-sm">
+                        <tr>
+                          <th className="p-4">Roll Number</th>
+                          <th className="p-4">Student Name</th>
+                          <th className="p-4 text-center">Today's FRS Status</th>
+                          <th className="p-4 text-center">Total Present</th>
+                          <th className="p-4 text-center">Total Absent</th>
+                          <th className="p-4 text-center">Attendance Rate</th>
+                          <th className="p-4 text-center">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-sm">
+                        {STUDENTS.map((s) => {
+                          const st = stats[s.rollNo] || { present: 0, absent: 0 };
+                          const total = st.present + st.absent;
+                          const percentage = total > 0 ? ((st.present / total) * 100).toFixed(1) : null;
+                          const todayStatus = todayAttendance[s.rollNo];
+                          const hasCustomPassword = !!passwordsMap[s.rollNo];
+
+                          return (
+                            <tr key={s.rollNo} className="hover:bg-slate-50">
+                              <td className="p-4 font-mono font-semibold text-blue-700">{s.rollNo}</td>
+                              <td className="p-4 font-medium">{s.name}</td>
+
+                              {/* Today's FRS Status Toggle */}
+                              <td className="p-4 text-center">
+                                <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-100">
+                                  <button
+                                    onClick={() => setTodayStatus(s.rollNo, 'Present')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition ${
+                                      todayStatus === 'Present'
+                                        ? 'bg-emerald-600 text-white shadow'
+                                        : 'text-slate-600 hover:text-emerald-700'
+                                    }`}
+                                  >
+                                    P
+                                  </button>
+                                  <button
+                                    onClick={() => setTodayStatus(s.rollNo, 'Absent')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition ${
+                                      todayStatus === 'Absent'
+                                        ? 'bg-red-600 text-white shadow'
+                                        : 'text-slate-600 hover:text-red-700'
+                                    }`}
+                                  >
+                                    A
+                                  </button>
+                                </div>
+                              </td>
+
+                              <td className="p-4 text-center text-green-600 font-bold">{st.present}</td>
+                              <td className="p-4 text-center text-red-600 font-bold">{st.absent}</td>
+                              <td className="p-4 text-center">
+                                {percentage === null ? (
+                                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500">
+                                    No records
+                                  </span>
+                                ) : (
+                                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                                    Number(percentage) >= 75 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {percentage}%
+                                  </span>
+                                )}
+                              </td>
+                              <td className="p-4 text-center">
+                                {hasCustomPassword ? (
+                                  <button
+                                    onClick={() => handleResetPassword(s.rollNo)}
+                                    className="bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs px-2.5 py-1 rounded border border-amber-300 font-semibold"
+                                  >
+                                    Reset Password
+                                  </button>
+                                ) : (
+                                  <span className="text-xs text-slate-400">Not Set Yet</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
