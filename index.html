@@ -286,6 +286,7 @@
     <h1>Sri Venkatesa Perumal College of Engineering & Technology</h1>
     <p>AUTONOMOUS — Affiliated to JNTUA, Ananthapuramu</p>
     <p style="margin-top: 4px; font-weight: 500;">B.Tech II Semester (R23) Regular Examinations Results Portal - June 2026</p>
+    <p style="margin-top: 6px; font-size: 0.75rem; color: #fcd34d;">Portal version 2 (Check Result fixed)</p>
   </header>
 
   <main class="container">
@@ -306,6 +307,7 @@
       </div>
 
       <div id="errorAlert" class="alert"></div>
+      <p id="dataStatus" style="margin-top: 12px; font-size: 0.8rem; color: #64748b;"></p>
     </div>
 
     <!-- Student Result Sheet Display -->
@@ -364,6 +366,7 @@
     const rollInput = document.getElementById('rollInput');
     const errorAlert = document.getElementById('errorAlert');
     const resultSheet = document.getElementById('resultSheet');
+    const dataLoaded = typeof examData !== 'undefined';
 
     function showError(msg) {
       errorAlert.textContent = msg;
@@ -390,6 +393,12 @@
 
     function findResult() {
       clearMessages();
+
+      if (!dataLoaded) {
+        showError('Result data file "data.js" was not found. Keep data.js in the same folder as index.html.');
+        return;
+      }
+
       const roll = rollInput.value.trim().toUpperCase();
 
       if (!roll) {
@@ -436,6 +445,19 @@
 
     rollInput.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') findResult();
+    });
+
+    // Show how many results are loaded (or a clear error if data.js is missing)
+    const dataStatus = document.getElementById('dataStatus');
+    if (dataLoaded) {
+      dataStatus.textContent = 'Results loaded: ' + Object.keys(examData).length + ' students.';
+    } else {
+      showError('Result data file "data.js" was not found. Keep data.js in the same folder as index.html.');
+    }
+
+    // Show any unexpected script error on the page instead of failing silently
+    window.addEventListener('error', function (e) {
+      showError('Script error: ' + e.message);
     });
   </script>
 </body>
