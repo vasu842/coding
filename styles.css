@@ -524,3 +524,9 @@ footer span {
   }
 
 }
+
+input[readonly] {
+  background: #f2f4f7;
+  font-weight: bold;
+  cursor: not-allowed;
+}

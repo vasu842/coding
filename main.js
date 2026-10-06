@@ -1,3 +1,6 @@
+/* Fixed registration fee (rupees) */
+const REGISTRATION_FEE = 800;
+
 const STORAGE_KEY =
   "KPL_PREMIER_TOURNAMENT_REGISTRATIONS";
 
@@ -287,10 +290,7 @@ form.addEventListener(
       ).value;
 
 
-    const amount =
-      document.getElementById(
-        "amount"
-      ).value;
+    const amount = REGISTRATION_FEE;
 
 
     const phonepeName =
