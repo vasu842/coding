@@ -1,25 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI Study Helper</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>MyAI - AI Chat</title>
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <nav>
-    <b>AI Study Helper</b>
-    <div>
-      <a href="index.html">Home</a>
-      <a href="login.html">Login</a>
-      <a href="register.html">Register</a>
-      <a href="chat.html">Chat</a>
-    </div>
-  </nav>
-  <div class="container hero">
-    <h1>Your AI Study Helper</h1>
-    <p>Ask any question and get a clear answer. Login to save your chats.</p>
-    <a class="btn" href="chat.html">Start Chatting</a>
+
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <div class="logo">
+        <div class="logo-icon">✦</div>
+        <span>MyAI</span>
+      </div>
+
+      <button id="newChat" class="new-chat">
+        + New Chat
+      </button>
+
+      <div class="history">
+
+        <p class="history-title">Recent Chats</p>
+
+        <div id="historyList"></div>
+
+      </div>
+
+      <div class="sidebar-bottom">
+
+        <button id="clearChat">
+          🗑 Clear Chat
+        </button>
+
+      </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- HEADER -->
+      <header class="header">
+
+        <div>
+          <h2>MyAI</h2>
+          <span class="online">
+            ● Online
+          </span>
+        </div>
+
+        <button id="themeButton" class="theme">
+          ☾
+        </button>
+
+      </header>
+
+
+      <!-- CHAT -->
+      <section id="chat" class="chat">
+
+        <div class="welcome">
+
+          <div class="big-logo">
+            ✦
+          </div>
+
+          <h1>
+            How can I help you?
+          </h1>
+
+          <p>
+            Ask anything and chat with AI.
+          </p>
+
+          <div class="suggestions">
+
+            <button onclick="useSuggestion('Explain Python in simple words')">
+              Explain Python
+            </button>
+
+            <button onclick="useSuggestion('Give me 5 important Java questions')">
+              Java Questions
+            </button>
+
+            <button onclick="useSuggestion('What is Artificial Intelligence?')">
+              What is AI?
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- INPUT -->
+      <div class="input-area">
+
+        <form id="chatForm">
+
+          <input
+            id="messageInput"
+            type="text"
+            placeholder="Message MyAI..."
+            autocomplete="off"
+          >
+
+          <button id="sendButton" type="submit">
+            ➤
+          </button>
+
+        </form>
+
+        <p class="disclaimer">
+          MyAI can make mistakes. Check important information.
+        </p>
+
+      </div>
+
+    </main>
+
   </div>
+
+  <script src="app.js"></script>
+
 </body>
 </html>
