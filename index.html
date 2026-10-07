@@ -3,108 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyAI - AI Chat</title>
+  <title>MyAI</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-  <div class="app">
+  <div class="app" id="app">
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
-
-      <div class="logo">
-        <div class="logo-icon">✦</div>
-        <span>MyAI</span>
+      <div class="side-top">
+        <span class="logo">✦ MyAI</span>
+        <button class="icon-btn toggle" title="Close sidebar">✕</button>
       </div>
 
-      <button id="newChat" class="new-chat">+ New Chat</button>
+      <button id="newChat" class="side-btn">✎ New chat</button>
 
-      <div class="history">
-        <p class="history-title">Recent Chats</p>
-        <div id="historyList"></div>
+      <p class="side-title">Recents</p>
+      <div id="historyList" class="history"></div>
+
+      <div class="side-bottom">
+        <button id="clearAll" class="side-btn">🗑 Delete all chats</button>
       </div>
-
-      <div class="sidebar-bottom">
-        <button id="clearChat">🗑 Clear Chat</button>
-      </div>
-
     </aside>
 
-
     <!-- MAIN -->
-    <main class="main">
+    <main class="main empty" id="main">
 
-      <!-- HEADER -->
-      <header class="header">
-        <div>
-          <h2>MyAI</h2>
-          <span class="online">● Online</span>
-        </div>
-
-        <button id="themeButton" class="theme">☾</button>
+      <header class="topbar">
+        <button class="icon-btn toggle" title="Toggle sidebar">☰</button>
+        <span class="brand">MyAI</span>
+        <button id="themeButton" class="icon-btn" title="Change theme">☾</button>
       </header>
 
+      <h1 class="welcome-title">What's on your mind today?</h1>
 
-      <!-- CHAT -->
-      <section id="chat" class="chat">
+      <section id="chat" class="chat"></section>
 
-        <div class="welcome">
-
-          <div class="big-logo">✦</div>
-
-          <h1>How can I help you?</h1>
-
-          <p>Ask anything and chat with AI.</p>
-
-          <div class="suggestions">
-            <button onclick="useSuggestion('Explain Python in simple words')">
-              Explain Python
-            </button>
-
-            <button onclick="useSuggestion('Give me 5 important Java questions')">
-              Java Questions
-            </button>
-
-            <button onclick="useSuggestion('Write a Python program to reverse a string')">
-              Coding Help
-            </button>
-
-            <button onclick="useSuggestion('What is Artificial Intelligence?')">
-              What is AI?
-            </button>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- INPUT -->
-      <div class="input-area">
-
-        <form id="chatForm">
-          <input
-            id="messageInput"
-            type="text"
-            placeholder="Message MyAI..."
-            autocomplete="off"
-          >
-          <button id="sendButton" type="submit">➤</button>
+      <div class="composer-wrap">
+        <form id="chatForm" class="composer">
+          <textarea id="messageInput" rows="1" placeholder="Ask MyAI"></textarea>
+          <button id="sendButton" type="submit" title="Send">➤</button>
         </form>
+        <p class="disclaimer">MyAI can make mistakes. Check important information.</p>
+      </div>
 
-        <p class="disclaimer">
-          MyAI can make mistakes. Check important information.
-        </p>
-
+      <div class="suggestions" id="suggestions">
+        <button data-prompt="Explain Python in simple words">💡 Explain Python</button>
+        <button data-prompt="Write a Python program to reverse a string">💻 Coding help</button>
+        <button data-prompt="Give me 5 important Java questions">📝 Java questions</button>
+        <button data-prompt="What is Artificial Intelligence?">🤖 What is AI?</button>
       </div>
 
     </main>
-
   </div>
 
   <script src="app.js"></script>
-
 </body>
 </html>

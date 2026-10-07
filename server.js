@@ -28,14 +28,14 @@ Be accurate. If you are not sure, say so. Do not make answers longer than needed
 `;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.post("/api/chat", async (req, res) => {
   try {
     const { messages } = req.body;
 
-    if (!messages || !Array.isArray(messages)) {
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: "No messages received" });
     }
 
@@ -43,7 +43,7 @@ app.post("/api/chat", async (req, res) => {
       return res.status(500).json({ error: "OPENAI_API_KEY is missing in .env file" });
     }
 
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const upstream = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -52,33 +52,67 @@ app.post("/api/chat", async (req, res) => {
       body: JSON.stringify({
         model: MODEL,
         instructions: SYSTEM_PROMPT,
-        input: messages.slice(-20)
+        input: messages.slice(-20),
+        stream: true
       })
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
+    if (!upstream.ok) {
+      const data = await upstream.json().catch(() => ({}));
       console.error("OpenAI error:", data);
-      return res.status(response.status).json({
+      return res.status(upstream.status).json({
         error: data.error?.message || "OpenAI API error"
       });
     }
 
-    const answer =
-      data.output_text ||
-      (data.output || [])
-        .filter(item => item.type === "message")
-        .flatMap(item => item.content || [])
-        .filter(c => c.type === "output_text")
-        .map(c => c.text)
-        .join("\n") ||
-      "No answer received.";
+    res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
 
-    res.json({ answer });
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    for await (const chunk of upstream.body) {
+      buffer += decoder.decode(chunk, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith("data:")) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === "[DONE]") continue;
+
+        let evt;
+        try {
+          evt = JSON.parse(payload);
+        } catch {
+          continue;
+        }
+
+        if (evt.type === "response.output_text.delta") {
+          res.write(`data: ${JSON.stringify({ delta: evt.delta })}\n\n`);
+        } else if (evt.type === "response.failed" || evt.type === "error") {
+          const msg =
+            evt.error?.message ||
+            evt.response?.error?.message ||
+            evt.message ||
+            "Stream error";
+          res.write(`data: ${JSON.stringify({ error: msg })}\n\n`);
+        }
+      }
+    }
+
+    res.write("data: [DONE]\n\n");
+    res.end();
   } catch (error) {
     console.error("SERVER ERROR:", error);
-    res.status(500).json({ error: error.message });
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+      res.end();
+    }
   }
 });
 

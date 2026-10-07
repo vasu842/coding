@@ -1,16 +1,23 @@
+const app = document.getElementById("app");
+const main = document.getElementById("main");
 const chat = document.getElementById("chat");
 const form = document.getElementById("chatForm");
 const input = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
-const newChat = document.getElementById("newChat");
-const clearChat = document.getElementById("clearChat");
 const historyList = document.getElementById("historyList");
 const themeButton = document.getElementById("themeButton");
 
+// Empty = same server that served this page.
 const API_URL = "";
 
-let messages = [];
-let history = JSON.parse(localStorage.getItem("myai_history") || "[]");
+let chats = [];
+try {
+  chats = JSON.parse(localStorage.getItem("myai_chats") || "[]");
+} catch (e) {
+  chats = [];
+}
+
+let currentId = null;
 let busy = false;
 
 
@@ -30,7 +37,7 @@ function renderMarkdown(text) {
   const blocks = [];
 
   const src = escapeHtml(text).replace(
-    /```(\w*)\n?([\s\S]*?)```/g,
+    /```(\w*)\n?([\s\S]*?)(```|$)/g,
     function (m, lang, code) {
       blocks.push({ lang: lang, code: code.replace(/\n$/, "") });
       return "\u0000" + (blocks.length - 1) + "\u0000";
@@ -95,14 +102,33 @@ function renderMarkdown(text) {
 }
 
 
-/* ---------- Chat ---------- */
+/* ---------- Chats storage ---------- */
 
-function addMessage(role, text) {
+function saveChats() {
+  localStorage.setItem("myai_chats", JSON.stringify(chats));
+}
+
+function getCurrent() {
+  return chats.find(function (c) { return c.id === currentId; });
+}
+
+function setEmpty(isEmpty) {
+  main.classList.toggle("empty", isEmpty);
+}
+
+function scrollDown() {
+  chat.scrollTop = chat.scrollHeight;
+}
+
+
+/* ---------- Rendering ---------- */
+
+function appendMessage(role, text) {
   const row = document.createElement("div");
-  row.className = "message-row " + role;
+  row.className = "msg-row " + role;
 
   const bubble = document.createElement("div");
-  bubble.className = "message " + role;
+  bubble.className = "msg " + role;
 
   if (role === "assistant") {
     bubble.innerHTML = renderMarkdown(text);
@@ -112,75 +138,248 @@ function addMessage(role, text) {
 
   row.appendChild(bubble);
   chat.appendChild(row);
-  chat.scrollTop = chat.scrollHeight;
+  scrollDown();
+  return bubble;
 }
 
-function removeWelcome() {
-  const welcome = document.querySelector(".welcome");
-  if (welcome) welcome.remove();
+function renderChat() {
+  chat.innerHTML = "";
+  const c = getCurrent();
+
+  if (!c || c.messages.length === 0) {
+    setEmpty(true);
+    return;
+  }
+
+  setEmpty(false);
+  c.messages.forEach(function (m) {
+    appendMessage(m.role, m.content);
+  });
+  scrollDown();
 }
+
+function renderSidebar() {
+  historyList.innerHTML = "";
+
+  chats
+    .slice()
+    .sort(function (a, b) { return b.updated - a.updated; })
+    .forEach(function (c) {
+      const item = document.createElement("div");
+      item.className = "history-item" + (c.id === currentId ? " active" : "");
+
+      const title = document.createElement("span");
+      title.textContent = c.title;
+
+      const del = document.createElement("button");
+      del.className = "del";
+      del.textContent = "✕";
+      del.title = "Delete chat";
+      del.onclick = function (e) {
+        e.stopPropagation();
+        deleteChat(c.id);
+      };
+
+      item.appendChild(title);
+      item.appendChild(del);
+      item.onclick = function () { openChat(c.id); };
+      historyList.appendChild(item);
+    });
+}
+
+function closeSidebarOnMobile() {
+  if (window.innerWidth <= 800) app.classList.add("collapsed");
+}
+
+function newChat() {
+  if (busy) return;
+  currentId = null;
+  renderChat();
+  renderSidebar();
+  input.focus();
+  closeSidebarOnMobile();
+}
+
+function openChat(id) {
+  if (busy) return;
+  currentId = id;
+  renderChat();
+  renderSidebar();
+  closeSidebarOnMobile();
+}
+
+function deleteChat(id) {
+  if (busy) return;
+  chats = chats.filter(function (c) { return c.id !== id; });
+  saveChats();
+  if (currentId === id) currentId = null;
+  renderChat();
+  renderSidebar();
+}
+
+
+/* ---------- Sending ---------- */
 
 async function sendMessage(text) {
-  if (busy) return;
+  text = (text || "").trim();
+  if (busy || !text) return;
+
+  let c = getCurrent();
+
+  if (!c) {
+    c = {
+      id: Date.now().toString(36),
+      title: text.slice(0, 40),
+      messages: [],
+      updated: Date.now()
+    };
+    chats.unshift(c);
+    currentId = c.id;
+    chat.innerHTML = "";
+  }
+
+  c.messages.push({ role: "user", content: text });
+  c.updated = Date.now();
+  saveChats();
+  renderSidebar();
+
+  setEmpty(false);
+  appendMessage("user", text);
+
+  input.value = "";
+  autoGrow();
+
   busy = true;
   sendButton.disabled = true;
 
-  removeWelcome();
-  addMessage("user", text);
-  messages.push({ role: "user", content: text });
-  input.value = "";
+  const bubble = appendMessage("assistant", "");
+  bubble.textContent = "Thinking...";
 
-  const thinking = document.createElement("div");
-  thinking.className = "message-row assistant";
-  thinking.innerHTML = '<div class="message assistant">Thinking...</div>';
-  chat.appendChild(thinking);
-  chat.scrollTop = chat.scrollHeight;
+  let answer = "";
 
   try {
-    const response = await fetch(API_URL + "/api/chat", {
+    const res = await fetch(API_URL + "/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: messages })
+      body: JSON.stringify({ messages: c.messages })
     });
 
-    const data = await response.json();
-    thinking.remove();
-
-    if (!response.ok) {
-      addMessage("assistant", data.error || "Something went wrong.");
-      messages.pop();
-      return;
+    if (!res.ok) {
+      const data = await res.json().catch(function () { return {}; });
+      throw new Error(data.error || "Something went wrong.");
     }
 
-    addMessage("assistant", data.answer);
-    messages.push({ role: "assistant", content: data.answer });
-    saveHistory(text);
-  } catch (error) {
-    thinking.remove();
-    messages.pop();
-    addMessage(
-      "assistant",
-      "Cannot connect to server. Open http://localhost:3000 and make sure 'npm start' is running."
-    );
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const result = await reader.read();
+      if (result.done) break;
+
+      buffer += decoder.decode(result.value, { stream: true });
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop();
+
+      for (const part of parts) {
+        const line = part.trim();
+        if (!line.startsWith("data:")) continue;
+
+        const payload = line.slice(5).trim();
+        if (payload === "[DONE]") continue;
+
+        let evt;
+        try {
+          evt = JSON.parse(payload);
+        } catch (e) {
+          continue;
+        }
+
+        if (evt.error) throw new Error(evt.error);
+
+        if (evt.delta) {
+          answer += evt.delta;
+          bubble.innerHTML = renderMarkdown(answer);
+          scrollDown();
+        }
+      }
+    }
+
+    if (!answer) throw new Error("No answer received.");
+
+    c.messages.push({ role: "assistant", content: answer });
+  } catch (err) {
+    if (answer) {
+      c.messages.push({ role: "assistant", content: answer });
+    } else {
+      const networkProblem = err instanceof TypeError;
+      bubble.classList.add("error");
+      bubble.textContent = networkProblem
+        ? "Cannot connect to server. Open http://localhost:3000 and make sure 'npm start' is running."
+        : err.message;
+
+      // remove the failed question so the next request stays valid
+      c.messages.pop();
+      if (c.messages.length === 0) {
+        chats = chats.filter(function (x) { return x.id !== c.id; });
+        currentId = null;
+      }
+    }
   } finally {
     busy = false;
     sendButton.disabled = false;
+    saveChats();
+    renderSidebar();
     input.focus();
   }
 }
 
-form.addEventListener("submit", function (e) {
-  e.preventDefault();
-  const text = input.value.trim();
-  if (!text) return;
-  sendMessage(text);
-});
 
-function useSuggestion(text) {
-  sendMessage(text);
+/* ---------- Events ---------- */
+
+function autoGrow() {
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight, 200) + "px";
 }
 
-/* Copy button for code blocks */
+input.addEventListener("input", autoGrow);
+
+input.addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    form.requestSubmit();
+  }
+});
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  sendMessage(input.value);
+});
+
+document.getElementById("suggestions").addEventListener("click", function (e) {
+  const btn = e.target.closest("button");
+  if (btn) sendMessage(btn.dataset.prompt);
+});
+
+document.getElementById("newChat").addEventListener("click", newChat);
+
+document.getElementById("clearAll").addEventListener("click", function () {
+  if (busy) return;
+  if (!confirm("Delete all chats?")) return;
+  chats = [];
+  currentId = null;
+  saveChats();
+  renderChat();
+  renderSidebar();
+});
+
+document.querySelectorAll(".toggle").forEach(function (b) {
+  b.addEventListener("click", function () {
+    app.classList.toggle("collapsed");
+  });
+});
+
+// Copy button for code blocks
 chat.addEventListener("click", function (e) {
   const btn = e.target.closest(".copy-btn");
   if (!btn) return;
@@ -191,46 +390,20 @@ chat.addEventListener("click", function (e) {
   });
 });
 
-newChat.addEventListener("click", function () {
-  messages = [];
-  chat.innerHTML =
-    '<div class="welcome">' +
-    '<div class="big-logo">✦</div>' +
-    "<h1>How can I help you?</h1>" +
-    "<p>Ask anything and chat with AI.</p>" +
-    "</div>";
-});
-
-clearChat.addEventListener("click", function () {
-  localStorage.removeItem("myai_history");
-  history = [];
-  historyList.innerHTML = "";
-  newChat.click();
-});
-
-function saveHistory(text) {
-  history.unshift(text);
-  history = history.slice(0, 10);
-  localStorage.setItem("myai_history", JSON.stringify(history));
-  renderHistory();
-}
-
-function renderHistory() {
-  historyList.innerHTML = "";
-  history.forEach(function (item) {
-    const div = document.createElement("div");
-    div.className = "history-item";
-    div.textContent = item;
-    div.onclick = function () {
-      input.value = item;
-      input.focus();
-    };
-    historyList.appendChild(div);
-  });
+// Theme
+function applyTheme(dark) {
+  document.body.classList.toggle("dark", dark);
+  themeButton.textContent = dark ? "☀" : "☾";
+  localStorage.setItem("myai_theme", dark ? "dark" : "light");
 }
 
 themeButton.addEventListener("click", function () {
-  document.body.classList.toggle("dark");
+  applyTheme(!document.body.classList.contains("dark"));
 });
 
-renderHistory();
+applyTheme(localStorage.getItem("myai_theme") === "dark");
+
+if (window.innerWidth <= 800) app.classList.add("collapsed");
+
+renderChat();
+renderSidebar();
