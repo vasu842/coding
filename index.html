@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>MyAI - AI Chat</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -21,24 +19,15 @@
         <span>MyAI</span>
       </div>
 
-      <button id="newChat" class="new-chat">
-        + New Chat
-      </button>
+      <button id="newChat" class="new-chat">+ New Chat</button>
 
       <div class="history">
-
         <p class="history-title">Recent Chats</p>
-
         <div id="historyList"></div>
-
       </div>
 
       <div class="sidebar-bottom">
-
-        <button id="clearChat">
-          🗑 Clear Chat
-        </button>
-
+        <button id="clearChat">🗑 Clear Chat</button>
       </div>
 
     </aside>
@@ -49,18 +38,12 @@
 
       <!-- HEADER -->
       <header class="header">
-
         <div>
           <h2>MyAI</h2>
-          <span class="online">
-            ● Online
-          </span>
+          <span class="online">● Online</span>
         </div>
 
-        <button id="themeButton" class="theme">
-          ☾
-        </button>
-
+        <button id="themeButton" class="theme">☾</button>
       </header>
 
 
@@ -69,20 +52,13 @@
 
         <div class="welcome">
 
-          <div class="big-logo">
-            ✦
-          </div>
+          <div class="big-logo">✦</div>
 
-          <h1>
-            How can I help you?
-          </h1>
+          <h1>How can I help you?</h1>
 
-          <p>
-            Ask anything and chat with AI.
-          </p>
+          <p>Ask anything and chat with AI.</p>
 
           <div class="suggestions">
-
             <button onclick="useSuggestion('Explain Python in simple words')">
               Explain Python
             </button>
@@ -91,10 +67,13 @@
               Java Questions
             </button>
 
+            <button onclick="useSuggestion('Write a Python program to reverse a string')">
+              Coding Help
+            </button>
+
             <button onclick="useSuggestion('What is Artificial Intelligence?')">
               What is AI?
             </button>
-
           </div>
 
         </div>
@@ -106,18 +85,13 @@
       <div class="input-area">
 
         <form id="chatForm">
-
           <input
             id="messageInput"
             type="text"
             placeholder="Message MyAI..."
             autocomplete="off"
           >
-
-          <button id="sendButton" type="submit">
-            ➤
-          </button>
-
+          <button id="sendButton" type="submit">➤</button>
         </form>
 
         <p class="disclaimer">
