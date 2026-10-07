@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav><b>AI Study Helper</b><div><a href="index.html">Home</a><a href="login.html">Login</a></div></nav>
+  <div class="card">
+    <h2>Register</h2>
+    <div class="error" id="error"></div>
+    <input id="name" placeholder="Name" />
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+    <button class="btn" onclick="register()">Create account</button>
+  </div>
+  <script>
+    async function register() {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) return (document.getElementById("error").innerText = data.error);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("name", data.name);
+      location.href = "chat.html";
+    }
+  </script>
+</body>
+</html>

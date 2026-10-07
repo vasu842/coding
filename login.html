@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav><b>AI Study Helper</b><div><a href="index.html">Home</a><a href="register.html">Register</a></div></nav>
+  <div class="card">
+    <h2>Login</h2>
+    <div class="error" id="error"></div>
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+    <button class="btn" onclick="login()">Login</button>
+  </div>
+  <script>
+    async function login() {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) return (document.getElementById("error").innerText = data.error);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("name", data.name);
+      location.href = "chat.html";
+    }
+  </script>
+</body>
+</html>
