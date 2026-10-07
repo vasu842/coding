@@ -13,34 +13,35 @@ app.post("/api/chat", async (req, res) => {
   try {
     const { messages } = req.body;
 
-    if (!Array.isArray(messages)) {
+    if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({
-        error: "Messages are required"
+        error: "No messages received"
       });
     }
 
     if (!process.env.OPENAI_API_KEY) {
       return res.status(500).json({
-        error: "OPENAI_API_KEY is missing in .env"
+        error: "OPENAI_API_KEY is missing in .env file"
       });
     }
 
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
+
       body: JSON.stringify({
-        model: "gpt-5.6",
-        input: messages.map(message => ({
-          role: message.role,
-          content: message.content
-        }))
+        model: "gpt-5",
+        input: messages
       })
     });
 
     const data = await response.json();
+
+    console.log("OpenAI response:", data);
 
     if (!response.ok) {
       return res.status(response.status).json({
@@ -49,14 +50,14 @@ app.post("/api/chat", async (req, res) => {
     }
 
     res.json({
-      answer: data.output_text || "No response received."
+      answer: data.output_text || "No answer received."
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("SERVER ERROR:", error);
 
     res.status(500).json({
-      error: "Server error"
+      error: error.message
     });
   }
 });
@@ -64,10 +65,15 @@ app.post("/api/chat", async (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({
     status: "OK",
-    message: "MyAI server is running"
+    message: "MyAI server is working"
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`MyAI running at http://localhost:${PORT}`);
+  console.log("");
+  console.log("================================");
+  console.log("      MyAI SERVER RUNNING");
+  console.log("================================");
+  console.log(`http://localhost:${PORT}`);
+  console.log("");
 });
