@@ -404,7 +404,5 @@ themeButton.addEventListener("click", function () {
 applyTheme(localStorage.getItem("myai_theme") === "dark");
 
 if (window.innerWidth <= 800) app.classList.add("collapsed");
-   const API_URL = "https://my-ai-chat-xxxx.onrender.com";
-
 renderChat();
 renderSidebar();
