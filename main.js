@@ -649,6 +649,16 @@ document.getElementById("payGPay").addEventListener("click", function (e) {
 });
 
 
+/* FIXTURES: fade matches that are over */
+
+document.querySelectorAll(".fx-day").forEach(function (day) {
+  const end = new Date(day.dataset.date + "T23:59:59");
+  if (end < new Date()) {
+    day.classList.add("past");
+  }
+});
+
+
 /* INITIAL LOAD */
 
 displayRegistrations();
