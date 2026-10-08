@@ -102,8 +102,7 @@ function displayRegistrations() {
 
         ||
 
-        player.team
-          .toLowerCase()
+        (player.role || "").toLowerCase()
           .includes(search)
 
         ||
@@ -147,7 +146,7 @@ function displayRegistrations() {
       </td>
 
       <td>
-        ${safe(player.team) || "-"}
+        ${safe(player.role) || "-"}
       </td>
 
       <td>
@@ -272,31 +271,23 @@ form.addEventListener(
       ).value.trim();
 
 
-    const team =
-      document.getElementById(
-        "team"
-      ).value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    const dob = document.getElementById("dob").value;
+
+    const role = document.getElementById("role").value;
 
 
-    const age =
-      document.getElementById(
-        "age"
-      ).value;
+    
 
 
-    const jersey =
-      document.getElementById(
-        "jersey"
-      ).value;
+    
 
 
     const amount = REGISTRATION_FEE;
 
 
-    const phonepeName =
-      document.getElementById(
-        "phonepeName"
-      ).value.trim();
+    
 
 
     const utr =
@@ -371,16 +362,13 @@ form.addEventListener(
       mobile,
 
       village,
+      email,
 
-      team,
+      dob,
 
-      age,
-
-      jersey,
+      role,
 
       amount,
-
-      phonepeName,
 
       utr,
 
@@ -533,40 +521,14 @@ document
       }
 
 
-      const headers = [
-
-        "Name",
-        "Mobile",
-        "Village",
-        "Team",
-        "Age",
-        "Jersey",
-        "Amount",
-        "PhonePe Name",
-        "UTR",
-        "Date"
-
-      ];
+      const headers = ["Name","Mobile","Email","Date of Birth","Role","Village","Amount","UTR","Date"];
 
 
       const rows =
         registrations.map(
           function (player) {
 
-            return [
-
-              player.name,
-              player.mobile,
-              player.village,
-              player.team,
-              player.age,
-              player.jersey,
-              player.amount,
-              player.phonepeName,
-              player.utr,
-              player.date
-
-            ];
+            return [player.name,player.mobile,player.email,player.dob,player.role,player.village,player.amount,player.utr,player.date];
 
           }
         );
@@ -657,6 +619,35 @@ document.querySelectorAll(".fx-day").forEach(function (day) {
     day.classList.add("past");
   }
 });
+
+
+/* PAY NOW (opens the UPI app chooser) */
+
+document.getElementById("payNow").addEventListener("click", function () {
+
+  const phone = document.getElementById("payPhone").value.trim();
+  const msg = document.getElementById("payMsg");
+
+  if (!/^[6-9][0-9]{9}$/.test(phone)) {
+    msg.textContent = "Please enter a valid 10-digit phone number.";
+    return;
+  }
+
+  msg.textContent = "";
+
+  const mobile = document.getElementById("mobile");
+  if (!mobile.value) { mobile.value = phone; }
+
+  const email = document.getElementById("email");
+  const payEmail = document.getElementById("payEmail").value.trim();
+  if (!email.value && payEmail) { email.value = payEmail; }
+
+  window.location.href = "upi://pay?" + payQuery();
+
+});
+
+
+document.getElementById("dob").max = new Date().toISOString().split("T")[0];
 
 
 /* INITIAL LOAD */

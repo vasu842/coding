@@ -139,16 +139,116 @@
   </section>
 
 
+  <!-- Payment -->
+
+  <section id="payment" class="section">
+
+    <div class="pay-layout">
+
+      <div class="pay-info">
+
+        <h2>KPL Registration Fee</h2>
+        <div class="bar"></div>
+
+        <p><strong>Welcome to KPL Karvetinagar Premier League</strong></p>
+
+        <p>
+          Pay the one-time registration fee of ₹800 to confirm
+          your place in KPL Season-1. Payment is accepted only
+          through PhonePe or Google Pay, to the one official
+          account shown here.
+        </p>
+
+        <h3>Who can register?</h3>
+
+        <ul>
+          <li>Cricket players from Karvetinagar and nearby villages.</li>
+          <li>Batsmen, bowlers, wicketkeepers and all-rounders.</li>
+          <li>Players of all skill levels, from beginners to advanced.</li>
+        </ul>
+
+        <h3>How to register</h3>
+
+        <ol>
+          <li>Pay ₹800 using the Payment Details box.</li>
+          <li>Copy the transaction ID (UTR) from your payment app.</li>
+          <li>Fill the Player Registration Form below and submit.</li>
+        </ol>
+
+      </div>
+
+
+      <div class="pay-card">
+
+        <h3>Payment Details</h3>
+        <div class="bar"></div>
+
+        <div class="pay-row">
+          <label>Amount *</label>
+          <input type="text" id="payAmount" value="₹800.00" readonly>
+        </div>
+
+        <div class="pay-row">
+          <label>Email</label>
+          <input type="email" id="payEmail">
+        </div>
+
+        <div class="pay-row">
+          <label>Phone *</label>
+          <div class="phone-row">
+            <span class="prefix">IN +91</span>
+            <input type="tel" id="payPhone" maxlength="10">
+          </div>
+        </div>
+
+        <p id="payMsg" class="pay-msg"></p>
+
+        <div class="pay-foot">
+          <div class="pay-logos">
+            <span>UPI</span>
+            <span>PhonePe</span>
+            <span>Google Pay</span>
+          </div>
+          <button type="button" id="payNow">Pay ₹800.00</button>
+        </div>
+
+        <div class="pay-alt">
+
+          <p>Or pay with:</p>
+
+          <div class="pay-buttons">
+            <a href="#" id="payPhonePe" class="pay-btn phonepe">PhonePe</a>
+            <a href="#" id="payGPay" class="pay-btn gpay">Google Pay</a>
+          </div>
+
+          <div class="qr-wrap">
+            <img src="qr.png" alt="PhonePe QR - K VANITHA" width="160" height="160">
+            <p>
+              Account: <strong>K VANITHA</strong><br>
+              UPI ID: <strong>9100399367@axl</strong><br>
+              Amount: <strong>₹800</strong>
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
   <!-- Registration -->
 
   <section id="register" class="section">
 
     <p class="tag">REGISTRATION</p>
 
-    <h2>Player Registration</h2>
+    <h2>Player Registration Form</h2>
 
     <p class="description">
-      Enter your details carefully.
+      Complete your registration in under 60 seconds. Open for Batsmen, Bowlers, Wicketkeepers &amp; All-Rounders.
     </p>
 
 
@@ -159,98 +259,52 @@
         <div class="form-grid">
 
           <div>
-            <label>Full Name *</label>
-            <input
-              type="text"
-              id="name"
-              placeholder="Enter full name"
-              required
-            >
+            <label>Player Full Name *</label>
+            <input type="text" id="name" placeholder="Enter player full name" required>
           </div>
-
 
           <div>
-            <label>Mobile Number *</label>
-            <input
-              type="tel"
-              id="mobile"
-              maxlength="10"
-              placeholder="10-digit mobile number"
-              required
-            >
+            <label>Contact / WhatsApp Number *</label>
+            <div class="phone-row">
+              <span class="prefix">+91</span>
+              <input type="tel" id="mobile" maxlength="10" placeholder="10-digit mobile number" required>
+            </div>
           </div>
-
 
           <div>
-            <label>Village / Area</label>
-            <input
-              type="text"
-              id="village"
-              placeholder="Enter village name"
-            >
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="name@example.com">
           </div>
-
 
           <div>
-            <label>Team Name</label>
-            <input
-              type="text"
-              id="team"
-              placeholder="Enter team name"
-            >
+            <label>Date of Birth *</label>
+            <input type="date" id="dob" required>
           </div>
-
 
           <div>
-            <label>Age</label>
-            <input
-              type="number"
-              id="age"
-              placeholder="Enter age"
-            >
+            <label>Playing Role / Position *</label>
+            <select id="role" required>
+              <option value="">Select your playing role</option>
+              <option>Batsman</option>
+              <option>Bowler</option>
+              <option>Wicketkeeper</option>
+              <option>All-Rounder</option>
+            </select>
           </div>
-
 
           <div>
-            <label>Jersey Number</label>
-            <input
-              type="number"
-              id="jersey"
-              placeholder="Optional"
-            >
+            <label>Village / Area *</label>
+            <input type="text" id="village" placeholder="Enter village name" required>
           </div>
-
 
           <div>
             <label>Registration Fee ₹</label>
-            <input
-              type="number"
-              id="amount"
-              value="800"
-              readonly
-            >
+            <input type="number" id="amount" value="800" readonly>
           </div>
-
 
           <div>
-            <label>PhonePe Registered Name</label>
-            <input
-              type="text"
-              id="phonepeName"
-              placeholder="PhonePe name"
-            >
-          </div>
-
-
-          <div class="full">
-            <label>PhonePe Transaction ID / UTR *</label>
-
-            <input
-              type="text"
-              id="utr"
-              placeholder="Enter PhonePe UTR"
-              required
-            >
+            <label>PhonePe / Google Pay UTR *</label>
+            <input type="text" id="utr" placeholder="Enter transaction ID / UTR" required>
           </div>
 
         </div>
@@ -260,27 +314,15 @@
 
         <div class="payment-box">
 
-          <h3>📲 Pay ₹800 (PhonePe / Google Pay only)</h3>
+          <h3>📲 Registration fee: ₹800</h3>
 
           <p>
-            Pay the registration fee only to the official
-            account below. Payments to any other account
-            will not be accepted.
+            Already paid? Enter your PhonePe / Google Pay
+            transaction ID (UTR) above.
           </p>
 
-          <div class="pay-buttons">
-            <a href="#" id="payPhonePe" class="pay-btn phonepe">Pay with PhonePe</a>
-            <a href="#" id="payGPay" class="pay-btn gpay">Pay with Google Pay</a>
-          </div>
-
-          <div class="upi-box">
-            <p>Account: <strong>K VANITHA</strong><br>
-            PhonePe / UPI ID: <strong>9100399367@axl</strong><br>
-            Amount: <strong>₹800</strong></p>
-          </div>
-
           <p>
-            After payment, enter your transaction ID / UTR above.
+            Not paid yet? <a href="#payment">Go to Payment Details</a>.
           </p>
 
         </div>
@@ -304,11 +346,13 @@
           type="submit"
           class="submit-btn"
         >
-          Submit Registration
+          REGISTER FOR KPL SEASON-1
         </button>
 
 
         <p id="message"></p>
+
+        <p class="privacy">🔒 Your player details are kept confidential and used only for tournament scheduling.</p>
 
       </form>
 
@@ -362,7 +406,7 @@
             <th>#</th>
             <th>Name</th>
             <th>Mobile</th>
-            <th>Team</th>
+            <th>Role</th>
             <th>Village</th>
             <th>Amount</th>
             <th>PhonePe UTR</th>
@@ -403,4 +447,4 @@
 <script src="main.js"></script>
 
 </body>
-</html>
+</html> 
