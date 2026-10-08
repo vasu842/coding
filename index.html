@@ -1,51 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>MyAI Chat</title>
-
-    <link rel="stylesheet" href="style.css">
+    <title>MyAI</title>
 </head>
 
 <body>
 
-    <div class="app">
+    <h1>MyAI</h1>
 
-        <header>
-            <h1>MyAI</h1>
-            <span>AI Assistant</span>
-        </header>
+    <!-- OUTPUT -->
+    <div id="chat"></div>
 
-        <main id="chat">
+    <!-- INPUT -->
+    <form id="chatForm">
 
-            <div class="welcome">
-                <h2>How can I help you?</h2>
-                <p>Ask me anything.</p>
-            </div>
+        <input
+            id="messageInput"
+            type="text"
+            placeholder="Ask anything..."
+        >
 
-        </main>
+        <button type="submit">
+            Send
+        </button>
 
-        <form id="chatForm">
-
-            <input
-                id="messageInput"
-                type="text"
-                placeholder="Message MyAI..."
-                autocomplete="off"
-            >
-
-            <button type="submit">
-                Send
-            </button>
-
-        </form>
-
-    </div>
+    </form>
 
     <script src="app.js"></script>
 
 </body>
+
 </html>

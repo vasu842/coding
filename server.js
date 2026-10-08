@@ -1,49 +1,69 @@
 require("dotenv").config();
 
 const express = require("express");
-const OpenAI = require("openai");
 const cors = require("cors");
+const OpenAI = require("openai");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const client = new OpenAI({
+const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
+
 
 app.post("/api/chat", async (req, res) => {
 
     try {
 
-        const { messages } = req.body;
+        // INPUT
+        const question = req.body.question;
 
-        const response = await client.responses.create({
+        if (!question) {
+            return res.status(400).json({
+                answer: "Please enter a question."
+            });
+        }
+
+
+        // GPT PROCESS
+        const response = await openai.responses.create({
+
             model: "gpt-5.5",
-            input: messages
+
+            input: question
+
         });
+
+
+        // OUTPUT
+        const answer = response.output_text;
+
 
         res.json({
-            answer: response.output_text
+            answer: answer
         });
+
 
     } catch (error) {
 
         console.error(error);
 
         res.status(500).json({
-            error: error.message
+            answer: "AI error: " + error.message
         });
+
     }
+
 });
 
-app.get("/", (req, res) => {
-    res.send("MyAI Backend is running");
-});
 
-const PORT = process.env.PORT || 3000;
+app.listen(3000, () => {
 
-app.listen(PORT, () => {
-    console.log(`Backend running on port ${PORT}`);
+    console.log(
+        "MyAI running at http://localhost:3000"
+    );
+
 });
