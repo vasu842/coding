@@ -626,6 +626,29 @@ document
   );
 
 
+/* PAYMENT LINKS (one official account only) */
+
+const PAY_UPI_ID = "9100399367@axl";
+const PAY_NAME = "K VANITHA";
+
+function payQuery() {
+  return "pa=" + encodeURIComponent(PAY_UPI_ID) +
+    "&pn=" + encodeURIComponent(PAY_NAME) +
+    "&am=" + REGISTRATION_FEE +
+    "&cu=INR&tn=" + encodeURIComponent("KPL Registration");
+}
+
+document.getElementById("payPhonePe").addEventListener("click", function (e) {
+  e.preventDefault();
+  window.location.href = "phonepe://pay?" + payQuery();
+});
+
+document.getElementById("payGPay").addEventListener("click", function (e) {
+  e.preventDefault();
+  window.location.href = "tez://upi/pay?" + payQuery();
+});
+
+
 /* INITIAL LOAD */
 
 displayRegistrations();

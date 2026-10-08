@@ -3,61 +3,344 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyAI</title>
-  <link rel="stylesheet" href="style.css">
+  <title>KPL Karvetinagar Premier League</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <div class="app" id="app">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="side-top">
-        <span class="logo">✦ MyAI</span>
-        <button class="icon-btn toggle" title="Close sidebar">✕</button>
-      </div>
+<header class="hero" id="top">
+  <nav>
+    <div class="logo">
+      🏏 <span>KPL</span>
+      <small>Karvetinagar Premier League</small>
+    </div>
 
-      <button id="newChat" class="side-btn">✎ New chat</button>
+    <div class="menu">
+      <a href="#top" class="active">HOME</a>
+      <a href="#register">REGISTER</a>
+      <a href="#players">PLAYERS</a>
+    </div>
 
-      <p class="side-title">Recents</p>
-      <div id="historyList" class="history"></div>
+    <a href="#register" class="nav-btn">REGISTER</a>
+  </nav>
 
-      <div class="side-bottom">
-        <button id="clearAll" class="side-btn">🗑 Delete all chats</button>
-      </div>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main empty" id="main">
-
-      <header class="topbar">
-        <button class="icon-btn toggle" title="Toggle sidebar">☰</button>
-        <span class="brand">MyAI</span>
-        <button id="themeButton" class="icon-btn" title="Change theme">☾</button>
-      </header>
-
-      <h1 class="welcome-title">What's on your mind today?</h1>
-
-      <section id="chat" class="chat"></section>
-
-      <div class="composer-wrap">
-        <form id="chatForm" class="composer">
-          <textarea id="messageInput" rows="1" placeholder="Ask MyAI"></textarea>
-          <button id="sendButton" type="submit" title="Send">➤</button>
-        </form>
-        <p class="disclaimer">MyAI can make mistakes. Check important information.</p>
-      </div>
-
-      <div class="suggestions" id="suggestions">
-        <button data-prompt="Explain Python in simple words">💡 Explain Python</button>
-        <button data-prompt="Write a Python program to reverse a string">💻 Coding help</button>
-        <button data-prompt="Give me 5 important Java questions">📝 Java questions</button>
-        <button data-prompt="What is Artificial Intelligence?">🤖 What is AI?</button>
-      </div>
-
-    </main>
+  <div class="ticker">
+    <span class="ticker-label">BREAKING NEWS</span>
+    <div class="ticker-track">
+      <span>KPL Karvetinagar Premier League registrations are open. Registration fee ₹800. Register now and join the tournament!</span>
+    </div>
   </div>
 
-  <script src="app.js"></script>
+  <div class="hero-content">
+    <div>
+      <p class="tag">KARVETINAGAR • VILLAGE CRICKET</p>
+
+      <h1>
+        KPL<br>
+        <span>Karvetinagar<br>Premier League</span>
+      </h1>
+
+      <p>
+        Register with your name and mobile number, pay the
+        ₹800 registration fee by PhonePe or Google Pay,
+        and join the tournament.
+      </p>
+
+      <a href="#register" class="btn">Register Now →</a>
+    </div>
+
+    <div class="trophy">🏆</div>
+  </div>
+</header>
+
+
+<main>
+
+  <!-- Statistics -->
+
+  <section class="stats">
+
+    <div>
+      <strong id="playerCount">0</strong>
+      <span>Registered Players</span>
+    </div>
+
+    <div>
+      <strong id="totalAmount">₹0</strong>
+      <span>Total Amount</span>
+    </div>
+
+    <div>
+      <strong id="todayCount">0</strong>
+      <span>Today's Registrations</span>
+    </div>
+
+  </section>
+
+
+  <!-- Registration -->
+
+  <section id="register" class="section">
+
+    <p class="tag">REGISTRATION</p>
+
+    <h2>Player Registration</h2>
+
+    <p class="description">
+      Enter your details carefully.
+    </p>
+
+
+    <div class="card">
+
+      <form id="registrationForm">
+
+        <div class="form-grid">
+
+          <div>
+            <label>Full Name *</label>
+            <input
+              type="text"
+              id="name"
+              placeholder="Enter full name"
+              required
+            >
+          </div>
+
+
+          <div>
+            <label>Mobile Number *</label>
+            <input
+              type="tel"
+              id="mobile"
+              maxlength="10"
+              placeholder="10-digit mobile number"
+              required
+            >
+          </div>
+
+
+          <div>
+            <label>Village / Area</label>
+            <input
+              type="text"
+              id="village"
+              placeholder="Enter village name"
+            >
+          </div>
+
+
+          <div>
+            <label>Team Name</label>
+            <input
+              type="text"
+              id="team"
+              placeholder="Enter team name"
+            >
+          </div>
+
+
+          <div>
+            <label>Age</label>
+            <input
+              type="number"
+              id="age"
+              placeholder="Enter age"
+            >
+          </div>
+
+
+          <div>
+            <label>Jersey Number</label>
+            <input
+              type="number"
+              id="jersey"
+              placeholder="Optional"
+            >
+          </div>
+
+
+          <div>
+            <label>Registration Fee ₹</label>
+            <input
+              type="number"
+              id="amount"
+              value="800"
+              readonly
+            >
+          </div>
+
+
+          <div>
+            <label>PhonePe Registered Name</label>
+            <input
+              type="text"
+              id="phonepeName"
+              placeholder="PhonePe name"
+            >
+          </div>
+
+
+          <div class="full">
+            <label>PhonePe Transaction ID / UTR *</label>
+
+            <input
+              type="text"
+              id="utr"
+              placeholder="Enter PhonePe UTR"
+              required
+            >
+          </div>
+
+        </div>
+
+
+        <!-- Payment -->
+
+        <div class="payment-box">
+
+          <h3>📲 Pay ₹800 (PhonePe / Google Pay only)</h3>
+
+          <p>
+            Pay the registration fee only to the official
+            account below. Payments to any other account
+            will not be accepted.
+          </p>
+
+          <div class="pay-buttons">
+            <a href="#" id="payPhonePe" class="pay-btn phonepe">Pay with PhonePe</a>
+            <a href="#" id="payGPay" class="pay-btn gpay">Pay with Google Pay</a>
+          </div>
+
+          <div class="upi-box">
+            <p>Account: <strong>K VANITHA</strong><br>
+            PhonePe / UPI ID: <strong>9100399367@axl</strong><br>
+            Amount: <strong>₹800</strong></p>
+          </div>
+
+          <p>
+            After payment, enter your transaction ID / UTR above.
+          </p>
+
+        </div>
+
+
+        <label class="checkbox">
+
+          <input
+            type="checkbox"
+            id="confirm"
+            required
+          >
+
+          I confirm that the information entered
+          is correct.
+
+        </label>
+
+
+        <button
+          type="submit"
+          class="submit-btn"
+        >
+          Submit Registration
+        </button>
+
+
+        <p id="message"></p>
+
+      </form>
+
+    </div>
+
+  </section>
+
+
+  <!-- Registered Players -->
+
+  <section id="players" class="section">
+
+    <div class="list-header">
+
+      <div>
+        <p class="tag">REGISTERED PLAYERS</p>
+
+        <h2>Registration List</h2>
+      </div>
+
+
+      <div class="actions">
+
+        <input
+          type="text"
+          id="search"
+          placeholder="Search player..."
+        >
+
+        <button id="exportBtn">
+          Export CSV
+        </button>
+
+        <button id="clearBtn" class="danger">
+          Clear All
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-card">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>#</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Team</th>
+            <th>Village</th>
+            <th>Amount</th>
+            <th>PhonePe UTR</th>
+            <th>Date</th>
+            <th>Action</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody id="playerTable"></tbody>
+
+      </table>
+
+
+      <div id="empty">
+        No registrations yet.
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<footer>
+
+  🏏 <strong>KPL Karvetinagar Premier League</strong>
+
+  <span>
+    Village Cricket Registration Portal
+  </span>
+
+</footer>
+
+
+<script src="main.js"></script>
+
 </body>
 </html>

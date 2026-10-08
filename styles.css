@@ -530,3 +530,149 @@ input[readonly] {
   font-weight: bold;
   cursor: not-allowed;
 }
+
+.pay-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.pay-btn {
+  flex: 1;
+  min-width: 150px;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  color: white;
+}
+
+.pay-btn.phonepe { background: #5f259f; }
+.pay-btn.gpay { background: #1a73e8; }
+
+.qr-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 14px 0;
+  flex-wrap: wrap;
+}
+
+.qr-wrap img {
+  background: white;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+
+.upi-box {
+  margin: 14px 0;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+
+/* ===== DARK NAVY + GOLD HEADER ===== */
+
+html { scroll-behavior: smooth; }
+
+.hero {
+  background: linear-gradient(135deg, #070c16, #0d1a2e 55%, #16294a);
+  border-bottom: 3px solid #d4a017;
+}
+
+nav {
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.logo span { color: #f5c542; }
+
+.menu {
+  display: flex;
+  gap: 6px;
+  background: #121a29;
+  border: 1px solid #243049;
+  border-radius: 999px;
+  padding: 6px;
+}
+
+.menu a {
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  padding: 10px 20px;
+  border-radius: 999px;
+}
+
+.menu a.active,
+.menu a:hover {
+  background: linear-gradient(135deg, #f5c542, #c9971a);
+  color: #111;
+}
+
+.nav-btn {
+  background: linear-gradient(135deg, #f5c542, #c9971a);
+  border-radius: 999px;
+  letter-spacing: 1.5px;
+  font-size: 13px;
+}
+
+.ticker {
+  display: flex;
+  align-items: center;
+  background: #05080f;
+  border-top: 1px solid #2a2310;
+  overflow: hidden;
+}
+
+.ticker-label {
+  background: #d62828;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 14px 22px;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.ticker-track {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ticker-track span {
+  display: inline-block;
+  padding-left: 100%;
+  color: #f1f5f9;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 14px;
+  animation: tick 22s linear infinite;
+}
+
+@keyframes tick {
+  to { transform: translateX(-100%); }
+}
+
+.hero h1 {
+  font-size: 60px;
+  line-height: 1.05;
+}
+
+.hero h1 span {
+  color: #f5c542;
+  font-size: 46px;
+}
+
+@media (max-width: 700px) {
+  .menu { order: 3; width: 100%; justify-content: center; }
+  .menu a { padding: 9px 12px; letter-spacing: 1px; }
+  .hero h1 { font-size: 46px; }
+  .hero h1 span { font-size: 32px; }
+}
