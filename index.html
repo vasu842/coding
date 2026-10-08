@@ -1,34 +1,63 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>MyAI</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyAI</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <div class="app" id="app">
 
-    <h1>MyAI</h1>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="side-top">
+        <span class="logo">✦ MyAI</span>
+        <button class="icon-btn toggle" title="Close sidebar">✕</button>
+      </div>
 
-    <!-- OUTPUT -->
-    <div id="chat"></div>
+      <button id="newChat" class="side-btn">✎ New chat</button>
 
-    <!-- INPUT -->
-    <form id="chatForm">
+      <p class="side-title">Recents</p>
+      <div id="historyList" class="history"></div>
 
-        <input
-            id="messageInput"
-            type="text"
-            placeholder="Ask anything..."
-        >
+      <div class="side-bottom">
+        <button id="clearAll" class="side-btn">🗑 Delete all chats</button>
+      </div>
+    </aside>
 
-        <button type="submit">
-            Send
-        </button>
+    <!-- MAIN -->
+    <main class="main empty" id="main">
 
-    </form>
+      <header class="topbar">
+        <button class="icon-btn toggle" title="Toggle sidebar">☰</button>
+        <span class="brand">MyAI</span>
+        <button id="themeButton" class="icon-btn" title="Change theme">☾</button>
+      </header>
 
-    <script src="app.js"></script>
+      <h1 class="welcome-title">What's on your mind today?</h1>
 
+      <section id="chat" class="chat"></section>
+
+      <div class="composer-wrap">
+        <form id="chatForm" class="composer">
+          <textarea id="messageInput" rows="1" placeholder="Ask MyAI"></textarea>
+          <button id="sendButton" type="submit" title="Send">➤</button>
+        </form>
+        <p class="disclaimer">MyAI can make mistakes. Check important information.</p>
+      </div>
+
+      <div class="suggestions" id="suggestions">
+        <button data-prompt="Explain Python in simple words">💡 Explain Python</button>
+        <button data-prompt="Write a Python program to reverse a string">💻 Coding help</button>
+        <button data-prompt="Give me 5 important Java questions">📝 Java questions</button>
+        <button data-prompt="What is Artificial Intelligence?">🤖 What is AI?</button>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
 </body>
-
 </html>
