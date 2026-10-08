@@ -111,11 +111,7 @@ function displayRegistrations() {
           .toLowerCase()
           .includes(search)
 
-        ||
-
-        player.utr
-          .toLowerCase()
-          .includes(search)
+        
 
       );
 
@@ -159,9 +155,7 @@ function displayRegistrations() {
         </strong>
       </td>
 
-      <td>
-        ${safe(player.utr)}
-      </td>
+      
 
       <td>
         ${player.date}
@@ -290,10 +284,7 @@ form.addEventListener(
     
 
 
-    const utr =
-      document.getElementById(
-        "utr"
-      ).value.trim();
+    
 
 
     /* MOBILE VALIDATION */
@@ -310,45 +301,9 @@ form.addEventListener(
     }
 
 
-    /* UTR VALIDATION */
+    
 
-    if (utr.length < 6) {
-
-      showMessage(
-        "Please enter a valid PhonePe UTR.",
-        true
-      );
-
-      return;
-
-    }
-
-
-    /* DUPLICATE UTR */
-
-    const duplicate =
-      registrations.some(
-        function (player) {
-
-          return player.utr
-            .toLowerCase() ===
-            utr.toLowerCase();
-
-        }
-      );
-
-
-    if (duplicate) {
-
-      showMessage(
-        "This PhonePe UTR is already registered.",
-        true
-      );
-
-      return;
-
-    }
-
+    
 
     /* PLAYER */
 
@@ -369,8 +324,6 @@ form.addEventListener(
       role,
 
       amount,
-
-      utr,
 
       date:
         new Date()
@@ -521,14 +474,14 @@ document
       }
 
 
-      const headers = ["Name","Mobile","Email","Date of Birth","Role","Village","Amount","UTR","Date"];
+      const headers = ["Name","Mobile","Email","Date of Birth","Role","Village","Amount","Date"];
 
 
       const rows =
         registrations.map(
           function (player) {
 
-            return [player.name,player.mobile,player.email,player.dob,player.role,player.village,player.amount,player.utr,player.date];
+            return [player.name,player.mobile,player.email,player.dob,player.role,player.village,player.amount,player.date];
 
           }
         );
